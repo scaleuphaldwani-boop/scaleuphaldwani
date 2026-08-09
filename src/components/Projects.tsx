@@ -1,15 +1,18 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { projects, type Project } from "@/data/projects";
 import { EASE, fadeUp, revealCard, stagger, viewportOnce } from "@/lib/motion";
 import { Magnetic } from "./Magnetic";
 
 function ProjectCard({ project, onOpen }: { project: Project; onOpen: () => void }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
   return (
     <motion.article
       variants={revealCard}
       whileHover={{ y: -4, scale: 1.01 }}
       transition={{ type: "spring", stiffness: 400, damping: 24 }}
+      onHoverStart={() => videoRef.current?.play().catch(() => {})}
+      onHoverEnd={() => videoRef.current?.pause()}
       className="group relative overflow-hidden rounded-2xl border border-border bg-card transition-shadow duration-200 hover:shadow-lg"
     >
       <button
@@ -19,11 +22,16 @@ function ProjectCard({ project, onOpen }: { project: Project; onOpen: () => void
         aria-label={`Play ${project.title}`}
       >
         <div className={`relative overflow-hidden ${project.vertical ? "aspect-[9/16]" : "aspect-video"}`}>
-          <img
-            src={project.poster}
-            alt={`${project.title} cover frame`}
-            loading="lazy"
-            className="size-full object-cover transition-all duration-300 ease-out group-hover:scale-105 group-hover:blur-[2px]"
+          <video
+            ref={videoRef}
+            src={project.video}
+            poster={project.poster}
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            aria-label={`${project.title} preview`}
+            className="size-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/25 to-transparent opacity-90" />
           <span className="absolute inset-0 grid place-items-center">
@@ -147,8 +155,6 @@ function Lightbox({ project, onClose }: { project: Project; onClose: () => void 
 
 export function Projects() {
   const [active, setActive] = useState<Project | null>(null);
-  const featured = projects.slice(0, 3);
-  const more = projects.slice(3);
 
   return (
     <section id="work" className="mx-auto max-w-7xl scroll-mt-24 px-5 py-24 sm:px-8">
@@ -163,7 +169,7 @@ export function Projects() {
           Selected work
         </motion.p>
         <motion.h2 variants={fadeUp} className="mt-4 font-display text-5xl sm:text-6xl">
-          Three cuts worth your minute
+          Every cut, start to finish
         </motion.h2>
         <motion.p variants={fadeUp} className="mt-4 text-muted-foreground">
           Every project below was shot and/or edited end to end — story, pacing, sound and
@@ -172,35 +178,13 @@ export function Projects() {
       </motion.div>
 
       <motion.div
-        variants={stagger(0.14)}
+        variants={stagger(0.12)}
         initial="hidden"
         whileInView="show"
         viewport={viewportOnce}
         className="mt-14 grid gap-8 md:grid-cols-2 lg:grid-cols-3"
       >
-        {featured.map((p) => (
-          <ProjectCard key={p.id} project={p} onOpen={() => setActive(p)} />
-        ))}
-      </motion.div>
-
-      <motion.h3
-        variants={fadeUp}
-        initial="hidden"
-        whileInView="show"
-        viewport={viewportOnce}
-        className="mt-24 font-display text-3xl text-muted-foreground"
-      >
-        More from the timeline
-      </motion.h3>
-
-      <motion.div
-        variants={stagger(0.1)}
-        initial="hidden"
-        whileInView="show"
-        viewport={viewportOnce}
-        className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
-      >
-        {more.map((p) => (
+        {projects.map((p) => (
           <ProjectCard key={p.id} project={p} onOpen={() => setActive(p)} />
         ))}
       </motion.div>
