@@ -8,12 +8,25 @@ const PHONES = ["9105456076", "9837787246"];
 
 export function Contact() {
   const [form, setForm] = useState({ name: "", email: "", project: "", message: "" });
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
+
+  const body = `Name: ${form.name}\nEmail: ${form.email}\nProject type: ${form.project || "Not specified"}\n\n${form.message}`;
 
   const mailto = `mailto:${EMAIL}?subject=${encodeURIComponent(
     `New project enquiry${form.project ? ` — ${form.project}` : ""}`,
-  )}&body=${encodeURIComponent(
-    `Name: ${form.name}\nEmail: ${form.email}\nProject type: ${form.project}\n\n${form.message}`,
+  )}&body=${encodeURIComponent(body)}`;
+
+  const whatsapp = `https://wa.me/91${PHONES[0]}?text=${encodeURIComponent(
+    `Hi Scaleup Haldwani!\n\n${body}`,
   )}`;
+
+  const validate = () => {
+    if (form.name.trim().length < 2) return "Please enter your name.";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(form.email.trim())) return "Please enter a valid email.";
+    if (form.message.trim().length < 10) return "Tell me a little more about the project.";
+    return "";
+  };
 
   const field =
     "w-full rounded-xl border border-border bg-background/60 px-4 py-3 text-sm text-foreground outline-none transition-all duration-200 placeholder:text-muted-foreground focus:border-primary/60 focus:ring-2 focus:ring-ring/40";
@@ -71,7 +84,11 @@ export function Contact() {
             viewport={viewportOnce}
             onSubmit={(e) => {
               e.preventDefault();
+              const err = validate();
+              setError(err);
+              if (err) return;
               window.location.href = mailto;
+              setSent(true);
             }}
             className="rounded-2xl border border-border bg-card p-7 shadow-elevated"
           >
@@ -127,6 +144,27 @@ export function Contact() {
             >
               Send enquiry
             </motion.button>
+
+            <motion.a
+              variants={fadeUp}
+              href={whatsapp}
+              target="_blank"
+              rel="noopener noreferrer"
+              whileHover={{ y: -4, scale: 1.01 }}
+              whileTap={{ scale: 0.95 }}
+              className="mt-3 block w-full rounded-full border border-border bg-secondary px-6 py-3.5 text-center text-sm font-semibold text-foreground transition-shadow duration-200 hover:shadow-lg"
+            >
+              Send on WhatsApp instead
+            </motion.a>
+
+            {error && (
+              <p className="mt-3 text-center text-xs text-destructive">{error}</p>
+            )}
+            {sent && !error && (
+              <p className="mt-3 text-center text-xs text-primary">
+                Enquiry ready in your mail app — hit send and I&apos;ll reply the same day.
+              </p>
+            )}
             <motion.p variants={fadeUp} className="mt-3 text-center text-xs text-muted-foreground">
               Opens your mail app addressed to {EMAIL}
             </motion.p>

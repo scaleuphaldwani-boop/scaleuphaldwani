@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Magnetic } from "./Magnetic";
+import { LogoMark, Wordmark } from "./Logo";
 
 const links = [
   { label: "Work", href: "#work" },
@@ -17,14 +18,12 @@ export function Nav() {
       className="fixed inset-x-0 top-0 z-50 border-b border-border/60 bg-background/70 backdrop-blur-xl"
     >
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-8">
-        <a href="#top" className="group flex items-center gap-2">
-          <span className="grid size-8 place-items-center rounded-md bg-primary text-primary-foreground font-display text-lg leading-none">
-            S
-          </span>
-          <span className="font-display text-xl tracking-widest">
-            SCALEUP <span className="text-primary">HALDWANI</span>
-          </span>
-        </a>
+        <Magnetic strength={0.15}>
+          <a href="#top" className="group flex items-center gap-3">
+            <LogoMark className="size-10 drop-shadow-[0_0_16px_color-mix(in_oklab,var(--primary)_45%,transparent)]" />
+            <Wordmark />
+          </a>
+        </Magnetic>
 
         <ul className="hidden items-center gap-8 md:flex">
           {links.map((l) => (
