@@ -10,12 +10,38 @@ export function Contact() {
   const [form, setForm] = useState({ name: "", email: "", project: "", message: "" });
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
+  const [sending, setSending] = useState(false);
 
   const body = `Name: ${form.name}\nEmail: ${form.email}\nProject type: ${form.project || "Not specified"}\n\n${form.message}`;
 
-  const mailto = `mailto:${EMAIL}?subject=${encodeURIComponent(
-    `New project enquiry${form.project ? ` — ${form.project}` : ""}`,
-  )}&body=${encodeURIComponent(body)}`;
+  const subject = `New project enquiry${form.project ? ` — ${form.project}` : ""}`;
+  const mailto = `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+  const submit = async () => {
+    setSending(true);
+    setError("");
+    try {
+      const res = await fetch(`https://formsubmit.co/ajax/${EMAIL}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          _subject: subject,
+          name: form.name,
+          email: form.email,
+          "project type": form.project || "Not specified",
+          message: form.message,
+        }),
+      });
+      if (!res.ok) throw new Error(String(res.status));
+      setSent(true);
+      setForm({ name: "", email: "", project: "", message: "" });
+    } catch {
+      setError("Couldn't send right now — opening your mail app instead.");
+      window.location.href = mailto;
+    } finally {
+      setSending(false);
+    }
+  };
 
   const whatsapp = `https://wa.me/91${PHONES[0]}?text=${encodeURIComponent(
     `Hi Scaleup Haldwani!\n\n${body}`,
@@ -87,8 +113,7 @@ export function Contact() {
               const err = validate();
               setError(err);
               if (err) return;
-              window.location.href = mailto;
-              setSent(true);
+              void submit();
             }}
             className="rounded-2xl border border-border bg-card p-7 shadow-elevated"
           >
@@ -137,12 +162,13 @@ export function Contact() {
             <motion.button
               variants={fadeUp}
               type="submit"
+              disabled={sending}
               whileHover={{ y: -4, scale: 1.01 }}
               whileTap={{ scale: 0.95 }}
               transition={{ type: "spring", stiffness: 420, damping: 22 }}
-              className="mt-6 w-full rounded-full bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground shadow-glow"
+              className="mt-6 w-full rounded-full bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground shadow-glow disabled:opacity-60"
             >
-              Send enquiry
+              {sending ? "Sending…" : "Send enquiry"}
             </motion.button>
 
             <motion.a
@@ -162,11 +188,11 @@ export function Contact() {
             )}
             {sent && !error && (
               <p className="mt-3 text-center text-xs text-primary">
-                Enquiry ready in your mail app — hit send and I&apos;ll reply the same day.
+                Enquiry sent — it&apos;s in my inbox and I&apos;ll reply the same day.
               </p>
             )}
             <motion.p variants={fadeUp} className="mt-3 text-center text-xs text-muted-foreground">
-              Opens your mail app addressed to {EMAIL}
+              Delivered straight to {EMAIL}
             </motion.p>
           </motion.form>
         </div>
