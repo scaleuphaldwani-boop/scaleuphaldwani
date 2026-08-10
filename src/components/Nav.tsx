@@ -4,6 +4,7 @@ import { LogoMark, Wordmark } from "./Logo";
 
 const links = [
   { label: "Work", href: "#work" },
+  { label: "Pricing", href: "#pricing" },
   { label: "Process", href: "#process" },
   { label: "About", href: "#about" },
   { label: "Contact", href: "#contact" },
