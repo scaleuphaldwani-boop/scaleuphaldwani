@@ -12,7 +12,7 @@ function useAutoplayInView(ref: React.RefObject<HTMLVideoElement | null>, enable
     if (!el || !enabled) return;
     const io = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) el.play().catch(() => {});
+        if (entry?.isIntersecting) el.play().catch(() => {});
         else el.pause();
       },
       { threshold: 0.35 },
@@ -60,7 +60,7 @@ function ProjectCard({
       className="group relative"
     >
       <motion.div
-        style={isMobile ? undefined : { rotateX, rotateY, transformStyle: "preserve-3d" }}
+        style={isMobile ? {} : { rotateX, rotateY, transformStyle: "preserve-3d" }}
         onPointerMove={(e) => {
           if (isMobile) return;
           const r = e.currentTarget.getBoundingClientRect();
@@ -71,7 +71,7 @@ function ProjectCard({
           px.set(0);
           py.set(0);
         }}
-        whileHover={isMobile ? undefined : { y: -6, scale: 1.01 }}
+        whileHover={isMobile ? {} : { y: -6, scale: 1.01 }}
         transition={{ type: "spring", stiffness: 400, damping: 24 }}
         className="relative overflow-hidden rounded-3xl border border-border bg-card shadow-sm transition-shadow duration-200 hover:shadow-elevated"
       >
@@ -97,7 +97,7 @@ function ProjectCard({
           >
             <motion.video
               ref={videoRef}
-              style={isMobile ? undefined : { y: mediaY }}
+              style={isMobile ? {} : { y: mediaY }}
               src={project.video}
               poster={project.poster}
               muted
