@@ -1,3 +1,4 @@
+import pf from "@/assets/project-foodcart.mp4.asset.json";
 import p1 from "@/assets/project-1.mp4.asset.json";
 import p2 from "@/assets/project-2.mp4.asset.json";
 import p3 from "@/assets/project-3.mp4.asset.json";
@@ -5,6 +6,7 @@ import p4 from "@/assets/project-4.mp4.asset.json";
 import p5 from "@/assets/project-5.mp4.asset.json";
 import p6 from "@/assets/project-6.mp4.asset.json";
 import p7 from "@/assets/project-7.mp4.asset.json";
+import cf from "@/assets/poster-foodcart.jpg.asset.json";
 import c1 from "@/assets/poster-1.jpg.asset.json";
 import c2 from "@/assets/poster-2.jpg.asset.json";
 import c3 from "@/assets/poster-3.jpg.asset.json";
