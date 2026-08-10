@@ -108,7 +108,7 @@ function ProjectCard({
               onMouseEnter={(e) => !isMobile && e.currentTarget.play().catch(() => {})}
               onMouseLeave={(e) => !isMobile && e.currentTarget.pause()}
               aria-label={`${project.title} preview`}
-              className="size-full scale-110 object-cover transition-transform duration-500 ease-out group-hover:scale-[1.18]"
+              className={`size-full object-cover transition-transform duration-500 ease-out ${isMobile ? "" : "scale-110 group-hover:scale-[1.18]"}`}
             />
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent opacity-90" />
 
