@@ -1,77 +1,164 @@
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useMotionValue, useScroll, useSpring, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { projects, type Project } from "@/data/projects";
-import { EASE, fadeUp, revealCard, stagger, viewportOnce } from "@/lib/motion";
+import { EASE, fadeUp, stagger, viewportOnce } from "@/lib/motion";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Magnetic } from "./Magnetic";
 
-function ProjectCard({ project, onOpen }: { project: Project; onOpen: () => void }) {
+/** Autoplays a muted inline video whenever it is on screen (essential on touch devices). */
+function useAutoplayInView(ref: React.RefObject<HTMLVideoElement | null>, enabled: boolean) {
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || !enabled) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) el.play().catch(() => {});
+        else el.pause();
+      },
+      { threshold: 0.35 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [ref, enabled]);
+}
+
+function ProjectCard({
+  project,
+  index,
+  onOpen,
+}: {
+  project: Project;
+  index: number;
+  onOpen: () => void;
+}) {
+  const isMobile = useIsMobile();
+  const cardRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  useAutoplayInView(videoRef, isMobile);
+
+  // pointer-driven 3D tilt (desktop only)
+  const px = useMotionValue(0);
+  const py = useMotionValue(0);
+  const rotateX = useSpring(useTransform(py, [-0.5, 0.5], [8, -8]), { stiffness: 220, damping: 18 });
+  const rotateY = useSpring(useTransform(px, [-0.5, 0.5], [-10, 10]), { stiffness: 220, damping: 18 });
+
+  // scroll-linked parallax on the media
+  const { scrollYProgress } = useScroll({
+    target: cardRef,
+    offset: ["start end", "end start"],
+  });
+  const mediaY = useTransform(scrollYProgress, [0, 1], ["-8%", "8%"]);
+
   return (
     <motion.article
-      variants={revealCard}
-      whileHover={{ y: -4, scale: 1.01 }}
-      transition={{ type: "spring", stiffness: 400, damping: 24 }}
-      onHoverStart={() => videoRef.current?.play().catch(() => {})}
-      onHoverEnd={() => videoRef.current?.pause()}
-      className="group relative overflow-hidden rounded-2xl border border-border bg-card transition-shadow duration-200 hover:shadow-lg"
+      ref={cardRef}
+      initial={{ opacity: 0, y: 60, scale: 0.94, rotateX: -8 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1, rotateX: 0 }}
+      viewport={viewportOnce}
+      transition={{ duration: 0.7, ease: EASE, delay: (index % 3) * 0.08 }}
+      style={{ perspective: 1200 }}
+      className="group relative"
     >
-      <button
-        type="button"
-        onClick={onOpen}
-        className="block w-full text-left active:scale-95 transition-transform duration-150"
-        aria-label={`Play ${project.title}`}
+      <motion.div
+        style={isMobile ? {} : { rotateX, rotateY, transformStyle: "preserve-3d" }}
+        onPointerMove={(e) => {
+          if (isMobile) return;
+          const r = e.currentTarget.getBoundingClientRect();
+          px.set((e.clientX - r.left) / r.width - 0.5);
+          py.set((e.clientY - r.top) / r.height - 0.5);
+        }}
+        onPointerLeave={() => {
+          px.set(0);
+          py.set(0);
+        }}
+        whileHover={isMobile ? {} : { y: -6, scale: 1.01 }}
+        transition={{ type: "spring", stiffness: 400, damping: 24 }}
+        className="relative overflow-hidden rounded-3xl border border-border bg-card shadow-sm transition-shadow duration-200 hover:shadow-elevated"
       >
-        <div className={`relative overflow-hidden ${project.vertical ? "aspect-[9/16]" : "aspect-video"}`}>
-          <video
-            ref={videoRef}
-            src={project.video}
-            poster={project.poster}
-            muted
-            loop
-            playsInline
-            preload="metadata"
-            aria-label={`${project.title} preview`}
-            className="size-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/25 to-transparent opacity-90" />
-          <span className="absolute inset-0 grid place-items-center">
-            <span className="grid size-14 place-items-center rounded-full bg-primary/90 text-primary-foreground opacity-0 shadow-glow transition-all duration-200 group-hover:opacity-100 group-hover:scale-110">
-              <svg viewBox="0 0 24 24" className="ml-0.5 size-6" fill="currentColor" aria-hidden>
-                <path d="M8 5v14l11-7z" />
-              </svg>
-            </span>
-          </span>
-        </div>
-      </button>
+        {/* animated glow sweep */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute -inset-px z-20 rounded-3xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+          style={{
+            background:
+              "linear-gradient(120deg, transparent 35%, color-mix(in oklab, var(--primary) 35%, transparent) 50%, transparent 65%)",
+            maskImage: "linear-gradient(#000 0 0)",
+          }}
+        />
 
-      <div className="p-6">
-        <div className="flex flex-wrap items-center gap-2">
-          {project.tags.map((t) => (
-            <span
-              key={t}
-              className="rounded-full border border-border bg-secondary px-3 py-1 text-[11px] uppercase tracking-widest text-muted-foreground"
-            >
-              {t}
-            </span>
-          ))}
-        </div>
-        <Magnetic strength={0.2}>
-          <h3 className="mt-4 font-display text-2xl tracking-wide">{project.title}</h3>
-        </Magnetic>
-        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{project.description}</p>
-        <Magnetic strength={0.3}>
-          <button
-            type="button"
-            onClick={onOpen}
-            className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-primary transition-colors duration-200 hover:text-accent active:scale-95"
+        <button
+          type="button"
+          onClick={onOpen}
+          className="block w-full text-left transition-transform duration-150 active:scale-95"
+          aria-label={`Play ${project.title}`}
+        >
+          <div
+            className={`relative overflow-hidden ${project.vertical ? "aspect-[9/16]" : "aspect-video"}`}
           >
-            Watch the cut
-            <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-1">
-              &rarr;
+            <motion.video
+              ref={videoRef}
+              style={isMobile ? {} : { y: mediaY }}
+              src={project.video}
+              poster={project.poster}
+              muted
+              loop
+              playsInline
+              autoPlay={isMobile}
+              preload="metadata"
+              onMouseEnter={(e) => !isMobile && e.currentTarget.play().catch(() => {})}
+              onMouseLeave={(e) => !isMobile && e.currentTarget.pause()}
+              aria-label={`${project.title} preview`}
+              className={`size-full object-cover transition-transform duration-500 ease-out ${isMobile ? "" : "scale-110 group-hover:scale-[1.18]"}`}
+            />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent opacity-90" />
+
+            <span className="pointer-events-none absolute left-4 top-4 font-display text-4xl leading-none text-foreground/80 mix-blend-difference sm:text-5xl">
+              {String(index + 1).padStart(2, "0")}
             </span>
-          </button>
-        </Magnetic>
-      </div>
+
+            <span className="pointer-events-none absolute inset-0 grid place-items-center">
+              <motion.span
+                initial={false}
+                whileInView={{ scale: [0.9, 1] }}
+                className="grid size-14 place-items-center rounded-full bg-primary/90 text-primary-foreground shadow-glow transition-all duration-200 md:opacity-0 md:group-hover:scale-110 md:group-hover:opacity-100"
+              >
+                <svg viewBox="0 0 24 24" className="ml-0.5 size-6" fill="currentColor" aria-hidden>
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              </motion.span>
+            </span>
+          </div>
+        </button>
+
+        <div className="p-5 sm:p-6">
+          <div className="flex flex-wrap items-center gap-2">
+            {project.tags.map((t) => (
+              <span
+                key={t}
+                className="rounded-full border border-border bg-secondary px-3 py-1 text-[10px] uppercase tracking-widest text-muted-foreground sm:text-[11px]"
+              >
+                {t}
+              </span>
+            ))}
+          </div>
+          <Magnetic strength={0.2}>
+            <h3 className="mt-4 font-display text-2xl tracking-wide">{project.title}</h3>
+          </Magnetic>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{project.description}</p>
+          <Magnetic strength={0.3}>
+            <button
+              type="button"
+              onClick={onOpen}
+              className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-primary transition-colors duration-200 hover:text-accent active:scale-95"
+            >
+              Watch the cut
+              <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-1">
+                &rarr;
+              </span>
+            </button>
+          </Magnetic>
+        </div>
+      </motion.div>
     </motion.article>
   );
 }
@@ -94,7 +181,7 @@ function Lightbox({ project, onClose }: { project: Project; onClose: () => void 
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2 }}
       onClick={onClose}
-      className="fixed inset-0 z-[70] grid place-items-center bg-background/85 p-4 backdrop-blur-md"
+      className="fixed inset-0 z-[70] overflow-y-auto bg-background/90 p-3 backdrop-blur-md sm:grid sm:place-items-center sm:p-4"
       role="dialog"
       aria-modal="true"
       aria-label={project.title}
@@ -105,7 +192,7 @@ function Lightbox({ project, onClose }: { project: Project; onClose: () => void 
         exit={{ opacity: 0, scale: 0.95, y: 8 }}
         transition={{ duration: 0.35, ease: EASE }}
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-5xl overflow-hidden rounded-2xl border border-border bg-card shadow-elevated"
+        className="mx-auto w-full max-w-5xl overflow-hidden rounded-2xl border border-border bg-card shadow-elevated"
       >
         <video
           key={project.id}
@@ -113,11 +200,13 @@ function Lightbox({ project, onClose }: { project: Project; onClose: () => void 
           poster={project.poster}
           controls
           autoPlay
+          muted
           playsInline
-          className={`w-full bg-black ${project.vertical ? "max-h-[70vh] object-contain" : ""}`}
+          preload="auto"
+          className={`w-full bg-black ${project.vertical ? "max-h-[65vh] object-contain" : ""}`}
         />
-        <div className="p-6">
-          <h3 className="font-display text-3xl">{project.title}</h3>
+        <div className="p-5 sm:p-6">
+          <h3 className="font-display text-2xl sm:text-3xl">{project.title}</h3>
           <motion.div
             initial="hidden"
             animate="show"
@@ -157,7 +246,7 @@ export function Projects() {
   const [active, setActive] = useState<Project | null>(null);
 
   return (
-    <section id="work" className="mx-auto max-w-7xl scroll-mt-24 px-5 py-24 sm:px-8">
+    <section id="work" className="mx-auto max-w-7xl scroll-mt-24 px-5 py-20 sm:px-8 sm:py-24">
       <motion.div
         variants={stagger()}
         initial="hidden"
@@ -168,26 +257,19 @@ export function Projects() {
         <motion.p variants={fadeUp} className="text-xs uppercase tracking-[0.3em] text-primary">
           Selected work
         </motion.p>
-        <motion.h2 variants={fadeUp} className="mt-4 font-display text-5xl sm:text-6xl">
+        <motion.h2 variants={fadeUp} className="mt-4 font-display text-4xl sm:text-6xl">
           Every cut, start to finish
         </motion.h2>
         <motion.p variants={fadeUp} className="mt-4 text-muted-foreground">
-          Every project below was shot and/or edited end to end — story, pacing, sound and
-          grade.
+          Every project below was shot and/or edited end to end — story, pacing, sound and grade.
         </motion.p>
       </motion.div>
 
-      <motion.div
-        variants={stagger(0.12)}
-        initial="hidden"
-        whileInView="show"
-        viewport={viewportOnce}
-        className="mt-14 grid gap-8 md:grid-cols-2 lg:grid-cols-3"
-      >
-        {projects.map((p) => (
-          <ProjectCard key={p.id} project={p} onOpen={() => setActive(p)} />
+      <div className="mt-12 grid gap-6 sm:mt-14 sm:gap-8 md:grid-cols-2 lg:grid-cols-3">
+        {projects.map((p, i) => (
+          <ProjectCard key={p.id} project={p} index={i} onOpen={() => setActive(p)} />
         ))}
-      </motion.div>
+      </div>
 
       <AnimatePresence>
         {active && <Lightbox project={active} onClose={() => setActive(null)} />}
