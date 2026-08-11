@@ -1,3 +1,4 @@
+import { Instagram } from "lucide-react";
 import { LogoMark, Wordmark } from "./Logo";
 
 export function Footer() {

@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { Instagram } from "lucide-react";
 import { fadeUp, stagger, viewportOnce } from "@/lib/motion";
 import { Magnetic } from "./Magnetic";
 
