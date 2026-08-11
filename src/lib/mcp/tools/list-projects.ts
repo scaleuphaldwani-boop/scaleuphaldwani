@@ -1,4 +1,5 @@
 import { defineTool } from "@lovable.dev/mcp-js";
+import { z } from "zod";
 import { projects } from "@/data/projects";
 
 export default defineTool({
@@ -7,6 +8,7 @@ export default defineTool({
   description:
     "List every video project in the Scaleup Haldwani portfolio with title, description, tags, role, year and video URL.",
   inputSchema: {},
+  outputSchema: { projects: z.array(z.record(z.string(), z.unknown())) },
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
   handler: (_input, ctx) => {
     if (!ctx.isAuthenticated()) {

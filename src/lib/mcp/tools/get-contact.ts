@@ -1,4 +1,5 @@
 import { defineTool } from "@lovable.dev/mcp-js";
+import { z } from "zod";
 
 const contact = {
   studio: "Scaleup Haldwani",
@@ -19,6 +20,14 @@ export default defineTool({
   description:
     "Return Scaleup Haldwani's contact details and the services offered, for booking or enquiry follow-up.",
   inputSchema: {},
+  outputSchema: {
+    studio: z.string(),
+    services: z.array(z.string()),
+    email: z.string(),
+    phones: z.array(z.string()),
+    whatsapp: z.string(),
+    website: z.string(),
+  },
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
   handler: (_input, ctx) => {
     if (!ctx.isAuthenticated()) {

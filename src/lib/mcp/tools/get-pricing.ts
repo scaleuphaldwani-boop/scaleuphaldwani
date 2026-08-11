@@ -1,4 +1,5 @@
 import { defineTool } from "@lovable.dev/mcp-js";
+import { z } from "zod";
 
 const packages = [
   {
@@ -29,6 +30,7 @@ export default defineTool({
   title: "Get pricing packages",
   description: "Return the Scaleup Haldwani pricing packages, starting rates and what each includes.",
   inputSchema: {},
+  outputSchema: { packages: z.array(z.record(z.string(), z.unknown())) },
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
   handler: (_input, ctx) => {
     if (!ctx.isAuthenticated()) {
