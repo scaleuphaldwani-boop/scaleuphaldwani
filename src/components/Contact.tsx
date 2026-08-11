@@ -100,6 +100,23 @@ export function Contact() {
                 </Magnetic>
               ))}
             </div>
+
+            <Magnetic strength={0.2}>
+              <a
+                href="https://www.instagram.com/scaleuphaldwani/?hl=en"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-4 rounded-xl border border-border bg-card px-5 py-4 text-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
+              >
+                <span className="inline-flex rounded-full bg-gradient-to-tr from-pink-500 via-purple-500 to-orange-400 p-2.5 text-white">
+                  <Instagram className="size-5" />
+                </span>
+                <span className="block text-xs uppercase tracking-widest text-muted-foreground">
+                  Follow on Instagram
+                  <span className="mt-1 block text-base font-medium text-foreground">@scaleuphaldwani</span>
+                </span>
+              </a>
+            </Magnetic>
           </motion.div>
         </motion.div>
 
