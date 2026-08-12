@@ -40,7 +40,7 @@ export const Route = createFileRoute("/api/chat")({
         const result = streamText({
           model: lovable.responses("openai/gpt-5.6-terra"),
           system: STUDIO_SYSTEM_PROMPT,
-          messages: convertToModelMessages(messages),
+          messages: await convertToModelMessages(messages),
           abortSignal: request.signal,
           providerOptions: {
             openai: {
