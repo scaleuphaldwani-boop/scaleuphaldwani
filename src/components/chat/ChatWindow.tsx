@@ -79,12 +79,15 @@ export function ChatWindow({
       <Conversation className="flex-1">
         <ConversationContent className="mx-auto w-full max-w-3xl gap-6">
           {messages.length === 0 ? (
-            <ConversationEmptyState
-              icon={<LogoMark className="size-12" />}
-              title="Studio Assistant"
-              description="Ask about my reels, packages, turnaround times or booking a shoot."
-            >
-              <div className="mt-4 flex flex-wrap justify-center gap-2">
+            <ConversationEmptyState>
+              <LogoMark className="size-14" />
+              <h2 className="font-display text-3xl tracking-wide text-foreground">
+                Studio Assistant
+              </h2>
+              <p className="max-w-sm text-sm text-muted-foreground">
+                Ask about my reels, packages, turnaround times or booking a shoot in Haldwani.
+              </p>
+              <div className="mt-2 flex flex-wrap justify-center gap-2">
                 {SUGGESTIONS.map((s) => (
                   <button
                     key={s}

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { loadThreads, newThreadId } from "@/lib/chat-threads";
 
 export const Route = createFileRoute("/chat/")({
@@ -24,13 +24,13 @@ export const Route = createFileRoute("/chat/")({
 });
 
 function ChatIndex() {
-  const navigate = useNavigate();
+  const router = useRouter();
 
   useEffect(() => {
     const existing = loadThreads();
     const id = existing[0]?.id ?? newThreadId();
-    void navigate({ to: "/chat/$threadId", params: { threadId: id }, replace: true });
-  }, [navigate]);
+    void router.navigate({ to: "/chat/$threadId", params: { threadId: id }, replace: true });
+  }, [router]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background text-sm text-muted-foreground">
