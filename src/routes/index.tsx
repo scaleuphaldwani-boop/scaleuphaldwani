@@ -8,6 +8,7 @@ import { About } from "@/components/About";
 import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
 import { ScrollProgress } from "@/components/ScrollProgress";
+import { ChatLauncher } from "@/components/ChatLauncher";
 
 const title = "Scaleup Haldwani | Video Editor & Cinematographer";
 const description =
@@ -41,6 +42,7 @@ function Index() {
         <Contact />
       </main>
       <Footer />
+      <ChatLauncher />
     </div>
   );
 }
