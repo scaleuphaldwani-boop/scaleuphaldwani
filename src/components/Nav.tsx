@@ -1,4 +1,6 @@
-import { motion } from "framer-motion";
+import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Menu, X } from "lucide-react";
 import { Magnetic } from "./Magnetic";
 import { LogoMark, Wordmark } from "./Logo";
 
@@ -11,6 +13,7 @@ const links = [
 ];
 
 export function Nav() {
+  const [open, setOpen] = useState(false);
   return (
     <motion.header
       initial={{ opacity: 0, y: -16 }}
@@ -47,12 +50,57 @@ export function Nav() {
             whileHover={{ y: -4, scale: 1.01 }}
             whileTap={{ scale: 0.95 }}
             transition={{ type: "spring", stiffness: 420, damping: 22 }}
-            className="inline-flex items-center rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground shadow-glow"
+            className="hidden items-center rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground shadow-glow sm:inline-flex"
           >
             Hire me
           </motion.a>
         </Magnetic>
+
+        <button
+          type="button"
+          aria-label={open ? "Close menu" : "Open menu"}
+          aria-expanded={open}
+          onClick={() => setOpen((v) => !v)}
+          className="inline-flex size-10 items-center justify-center rounded-full border border-border/70 text-foreground transition-colors hover:bg-secondary md:hidden"
+        >
+          {open ? <X className="size-5" /> : <Menu className="size-5" />}
+        </button>
       </nav>
+
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+            className="overflow-hidden border-t border-border/60 bg-background/95 backdrop-blur-xl md:hidden"
+          >
+            <ul className="flex flex-col px-5 py-3">
+              {links.map((l) => (
+                <li key={l.href}>
+                  <a
+                    href={l.href}
+                    onClick={() => setOpen(false)}
+                    className="block py-3 text-base text-muted-foreground transition-colors hover:text-foreground"
+                  >
+                    {l.label}
+                  </a>
+                </li>
+              ))}
+              <li>
+                <a
+                  href="#contact"
+                  onClick={() => setOpen(false)}
+                  className="mt-2 inline-flex w-full items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground shadow-glow"
+                >
+                  Hire me
+                </a>
+              </li>
+            </ul>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.header>
   );
 }
