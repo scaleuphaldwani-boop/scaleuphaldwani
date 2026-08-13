@@ -44,15 +44,19 @@ const ProjectCard = memo(function ProjectCard({
   project,
   index,
   onOpen,
+  carousel = false,
+  active = false,
 }: {
   project: Project;
   index: number;
   onOpen: (project: Project) => void;
+  carousel?: boolean;
+  active?: boolean;
 }) {
   const isMobile = useIsMobile();
   const cardRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const shouldLoad = useLazyVideo(cardRef, videoRef, isMobile);
+  const shouldLoad = useLazyVideo(cardRef, videoRef, isMobile && active);
 
   // pointer-driven 3D tilt (desktop only)
   const px = useMotionValue(0);
@@ -68,12 +72,18 @@ const ProjectCard = memo(function ProjectCard({
   return (
     <motion.article
       ref={cardRef}
-      initial={{ opacity: 0, y: 60, scale: 0.94 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      initial={carousel ? false : { opacity: 0, y: 60, scale: 0.94 }}
+      whileInView={carousel ? {} : { opacity: 1, y: 0, scale: 1 }}
       viewport={viewportOnce}
       transition={{ duration: 0.7, ease: EASE, delay: (index % 3) * 0.08 }}
       style={{ perspective: 1200 }}
-      className="group relative"
+      className={
+        carousel
+          ? `group relative w-[82vw] shrink-0 snap-center transition-[transform,opacity] duration-300 ease-out will-change-transform ${
+              active ? "scale-100 opacity-100" : "scale-95 opacity-60"
+            }`
+          : "group relative"
+      }
     >
       <motion.div
         style={isMobile ? {} : { rotateX, rotateY, transformStyle: "preserve-3d" }}
@@ -124,6 +134,20 @@ const ProjectCard = memo(function ProjectCard({
               className={`size-full object-cover transition-transform duration-500 ease-out will-change-transform ${isMobile ? "" : "scale-105 group-hover:scale-110"}`}
             />
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent opacity-90" />
+
+            {carousel && (
+              <span
+                className={`pointer-events-none absolute bottom-4 left-4 right-4 flex items-center justify-between gap-2 rounded-full border border-white/10 bg-background/70 px-3 py-2 text-[10px] uppercase tracking-widest text-foreground/90 backdrop-blur-sm transition-opacity duration-300 ${
+                  active ? "opacity-100" : "opacity-0"
+                }`}
+              >
+                <span className="truncate">{project.tags[0]}</span>
+                <span className="flex shrink-0 items-center gap-1.5 text-primary">
+                  <span className="size-1.5 animate-ping rounded-full bg-primary" />
+                  Tap to preview
+                </span>
+              </span>
+            )}
 
             <span className="pointer-events-none absolute left-4 top-4 font-display text-4xl leading-none text-foreground/80 mix-blend-difference sm:text-5xl">
               {String(index + 1).padStart(2, "0")}
@@ -176,6 +200,44 @@ export function Projects() {
   const [active, setActive] = useState<Project | null>(null);
   const handleOpen = useCallback((p: Project) => setActive(p), []);
   const handleClose = useCallback(() => setActive(null), []);
+  const isMobile = useIsMobile();
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const [bounce, setBounce] = useState(false);
+  const endHit = useRef(false);
+
+  useEffect(() => {
+    const el = trackRef.current;
+    if (!el || !isMobile) return;
+    let raf = 0;
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        const max = el.scrollWidth - el.clientWidth;
+        const p = max > 0 ? Math.min(1, Math.max(0, el.scrollLeft / max)) : 0;
+        setProgress(p);
+        setActiveIndex(Math.round(p * (projects.length - 1)));
+        if (max > 0 && el.scrollLeft >= max - 2) {
+          if (!endHit.current) {
+            endHit.current = true;
+            navigator.vibrate?.(12);
+            setBounce(true);
+            window.setTimeout(() => setBounce(false), 460);
+          }
+        } else {
+          endHit.current = false;
+        }
+      });
+    };
+    onScroll();
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      el.removeEventListener("scroll", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [isMobile]);
 
   return (
     <section id="work" className="mx-auto max-w-7xl scroll-mt-24 px-5 py-20 sm:px-8 sm:py-24">
@@ -197,11 +259,42 @@ export function Projects() {
         </motion.p>
       </motion.div>
 
-      <div className="mt-12 grid gap-6 sm:mt-14 sm:gap-8 md:grid-cols-2 lg:grid-cols-3">
-        {projects.map((p, i) => (
-          <ProjectCard key={p.id} project={p} index={i} onOpen={handleOpen} />
-        ))}
-      </div>
+      {isMobile ? (
+        <div className="mt-10">
+          <div
+            ref={trackRef}
+            className={`no-scrollbar -mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-2 ${bounce ? "animate-edge-bounce" : ""}`}
+            style={{ scrollBehavior: "smooth" }}
+          >
+            {projects.map((p, i) => (
+              <ProjectCard
+                key={p.id}
+                project={p}
+                index={i}
+                onOpen={handleOpen}
+                carousel
+                active={i === activeIndex}
+              />
+            ))}
+          </div>
+          <div className="mt-5 h-[3px] w-full overflow-hidden rounded-full bg-secondary">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-primary to-accent shadow-glow transition-[width] duration-150 ease-out"
+              style={{ width: `${Math.max(12, progress * 100)}%` }}
+            />
+          </div>
+          <p className="mt-3 text-[11px] uppercase tracking-widest text-muted-foreground">
+            {String(activeIndex + 1).padStart(2, "0")} / {String(projects.length).padStart(2, "0")}{" "}
+            — swipe to explore
+          </p>
+        </div>
+      ) : (
+        <div className="mt-12 grid gap-6 sm:mt-14 sm:gap-8 md:grid-cols-2 lg:grid-cols-3">
+          {projects.map((p, i) => (
+            <ProjectCard key={p.id} project={p} index={i} onOpen={handleOpen} />
+          ))}
+        </div>
+      )}
 
       <AnimatePresence>
         {active && (
