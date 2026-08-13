@@ -70,7 +70,7 @@ export function Hero() {
               whileHover={{ y: -4, scale: 1.01 }}
               whileTap={{ scale: 0.95 }}
               transition={spring}
-              className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-7 py-3.5 text-sm font-semibold text-foreground backdrop-blur transition-shadow duration-200 hover:shadow-lg"
+              className="inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-7 py-3.5 text-sm font-semibold text-foreground transition-shadow duration-200 hover:shadow-lg"
             >
               Start a project
             </motion.a>

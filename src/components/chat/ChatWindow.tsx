@@ -132,7 +132,7 @@ export function ChatWindow({
         <ConversationScrollButton />
       </Conversation>
 
-      <div className="border-t border-border/60 bg-background/80 p-3 backdrop-blur-xl">
+      <div className="border-t border-border/60 bg-background/90 p-3">
         <div className="mx-auto w-full max-w-3xl">
           <PromptInput
             onSubmit={(message, event) => {
