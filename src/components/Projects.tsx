@@ -76,7 +76,7 @@ const ProjectCard = memo(function ProjectCard({
       className="group relative"
     >
       <motion.div
-        style={isMobile ? undefined : { rotateX, rotateY, transformStyle: "preserve-3d" }}
+        style={isMobile ? {} : { rotateX, rotateY, transformStyle: "preserve-3d" }}
         onPointerMove={(e) => {
           if (isMobile || e.pointerType !== "mouse") return;
           const r = e.currentTarget.getBoundingClientRect();
@@ -87,7 +87,7 @@ const ProjectCard = memo(function ProjectCard({
           px.set(0);
           py.set(0);
         }}
-        whileHover={isMobile ? undefined : { y: -6, scale: 1.01 }}
+        whileHover={isMobile ? {} : { y: -6, scale: 1.01 }}
         transition={{ type: "spring", stiffness: 400, damping: 24 }}
         className="relative overflow-hidden rounded-3xl border border-border bg-card shadow-sm transition-shadow duration-200 hover:shadow-elevated"
       >
