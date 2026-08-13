@@ -44,15 +44,19 @@ const ProjectCard = memo(function ProjectCard({
   project,
   index,
   onOpen,
+  carousel = false,
+  active = false,
 }: {
   project: Project;
   index: number;
   onOpen: (project: Project) => void;
+  carousel?: boolean;
+  active?: boolean;
 }) {
   const isMobile = useIsMobile();
   const cardRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const shouldLoad = useLazyVideo(cardRef, videoRef, isMobile);
+  const shouldLoad = useLazyVideo(cardRef, videoRef, isMobile && active);
 
   // pointer-driven 3D tilt (desktop only)
   const px = useMotionValue(0);
@@ -68,12 +72,18 @@ const ProjectCard = memo(function ProjectCard({
   return (
     <motion.article
       ref={cardRef}
-      initial={{ opacity: 0, y: 60, scale: 0.94 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      initial={carousel ? false : { opacity: 0, y: 60, scale: 0.94 }}
+      whileInView={carousel ? undefined : { opacity: 1, y: 0, scale: 1 }}
       viewport={viewportOnce}
       transition={{ duration: 0.7, ease: EASE, delay: (index % 3) * 0.08 }}
       style={{ perspective: 1200 }}
-      className="group relative"
+      className={
+        carousel
+          ? `group relative w-[82vw] shrink-0 snap-center transition-[transform,opacity] duration-300 ease-out will-change-transform ${
+              active ? "scale-100 opacity-100" : "scale-95 opacity-60"
+            }`
+          : "group relative"
+      }
     >
       <motion.div
         style={isMobile ? {} : { rotateX, rotateY, transformStyle: "preserve-3d" }}
@@ -124,6 +134,20 @@ const ProjectCard = memo(function ProjectCard({
               className={`size-full object-cover transition-transform duration-500 ease-out will-change-transform ${isMobile ? "" : "scale-105 group-hover:scale-110"}`}
             />
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent opacity-90" />
+
+            {carousel && (
+              <span
+                className={`pointer-events-none absolute bottom-4 left-4 right-4 flex items-center justify-between gap-2 rounded-full border border-white/10 bg-background/70 px-3 py-2 text-[10px] uppercase tracking-widest text-foreground/90 backdrop-blur-sm transition-opacity duration-300 ${
+                  active ? "opacity-100" : "opacity-0"
+                }`}
+              >
+                <span className="truncate">{project.tags[0]}</span>
+                <span className="flex shrink-0 items-center gap-1.5 text-primary">
+                  <span className="size-1.5 animate-ping rounded-full bg-primary" />
+                  Tap to preview
+                </span>
+              </span>
+            )}
 
             <span className="pointer-events-none absolute left-4 top-4 font-display text-4xl leading-none text-foreground/80 mix-blend-difference sm:text-5xl">
               {String(index + 1).padStart(2, "0")}
