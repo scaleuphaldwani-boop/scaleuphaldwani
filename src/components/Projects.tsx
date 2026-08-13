@@ -200,6 +200,44 @@ export function Projects() {
   const [active, setActive] = useState<Project | null>(null);
   const handleOpen = useCallback((p: Project) => setActive(p), []);
   const handleClose = useCallback(() => setActive(null), []);
+  const isMobile = useIsMobile();
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const [bounce, setBounce] = useState(false);
+  const endHit = useRef(false);
+
+  useEffect(() => {
+    const el = trackRef.current;
+    if (!el || !isMobile) return;
+    let raf = 0;
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        const max = el.scrollWidth - el.clientWidth;
+        const p = max > 0 ? Math.min(1, Math.max(0, el.scrollLeft / max)) : 0;
+        setProgress(p);
+        setActiveIndex(Math.round(p * (projects.length - 1)));
+        if (max > 0 && el.scrollLeft >= max - 2) {
+          if (!endHit.current) {
+            endHit.current = true;
+            navigator.vibrate?.(12);
+            setBounce(true);
+            window.setTimeout(() => setBounce(false), 460);
+          }
+        } else {
+          endHit.current = false;
+        }
+      });
+    };
+    onScroll();
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      el.removeEventListener("scroll", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [isMobile]);
 
   return (
     <section id="work" className="mx-auto max-w-7xl scroll-mt-24 px-5 py-20 sm:px-8 sm:py-24">
@@ -221,11 +259,42 @@ export function Projects() {
         </motion.p>
       </motion.div>
 
-      <div className="mt-12 grid gap-6 sm:mt-14 sm:gap-8 md:grid-cols-2 lg:grid-cols-3">
-        {projects.map((p, i) => (
-          <ProjectCard key={p.id} project={p} index={i} onOpen={handleOpen} />
-        ))}
-      </div>
+      {isMobile ? (
+        <div className="mt-10">
+          <div
+            ref={trackRef}
+            className={`no-scrollbar -mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-2 ${bounce ? "animate-edge-bounce" : ""}`}
+            style={{ scrollBehavior: "smooth" }}
+          >
+            {projects.map((p, i) => (
+              <ProjectCard
+                key={p.id}
+                project={p}
+                index={i}
+                onOpen={handleOpen}
+                carousel
+                active={i === activeIndex}
+              />
+            ))}
+          </div>
+          <div className="mt-5 h-[3px] w-full overflow-hidden rounded-full bg-secondary">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-primary to-accent shadow-glow transition-[width] duration-150 ease-out"
+              style={{ width: `${Math.max(12, progress * 100)}%` }}
+            />
+          </div>
+          <p className="mt-3 text-[11px] uppercase tracking-widest text-muted-foreground">
+            {String(activeIndex + 1).padStart(2, "0")} / {String(projects.length).padStart(2, "0")}{" "}
+            — swipe to explore
+          </p>
+        </div>
+      ) : (
+        <div className="mt-12 grid gap-6 sm:mt-14 sm:gap-8 md:grid-cols-2 lg:grid-cols-3">
+          {projects.map((p, i) => (
+            <ProjectCard key={p.id} project={p} index={i} onOpen={handleOpen} />
+          ))}
+        </div>
+      )}
 
       <AnimatePresence>
         {active && (
