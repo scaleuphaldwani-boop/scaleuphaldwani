@@ -73,7 +73,7 @@ const ProjectCard = memo(function ProjectCard({
     <motion.article
       ref={cardRef}
       initial={carousel ? false : { opacity: 0, y: 60, scale: 0.94 }}
-      whileInView={carousel ? undefined : { opacity: 1, y: 0, scale: 1 }}
+      whileInView={carousel ? {} : { opacity: 1, y: 0, scale: 1 }}
       viewport={viewportOnce}
       transition={{ duration: 0.7, ease: EASE, delay: (index % 3) * 0.08 }}
       style={{ perspective: 1200 }}
