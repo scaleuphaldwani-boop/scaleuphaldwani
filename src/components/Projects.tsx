@@ -1,17 +1,14 @@
-import { AnimatePresence, motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Suspense, lazy, memo, useCallback, useEffect, useRef, useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { projects, type Project } from "@/data/projects";
-import { EASE, fadeUp, stagger, viewportOnce } from "@/lib/motion";
+import { fadeUp, stagger, viewportOnce } from "@/lib/motion";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Magnetic } from "./Magnetic";
 
 const ProjectLightbox = lazy(() => import("./ProjectLightbox"));
 
-/**
- * One observer per card handles two jobs cheaply:
- *  - lazily attach the video source only when the card is near the viewport
- *  - autoplay/pause the muted inline preview while it is on screen (touch devices)
- */
+/** Lazily attach the video source + autoplay the focused card's muted preview. */
 function useLazyVideo(
   cardRef: React.RefObject<HTMLElement | null>,
   videoRef: React.RefObject<HTMLVideoElement | null>,
@@ -22,20 +19,19 @@ function useLazyVideo(
   useEffect(() => {
     const el = cardRef.current;
     if (!el) return;
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry) return;
-        if (entry.isIntersecting) setLoad(true);
-        const v = videoRef.current;
-        if (!v || !autoplay) return;
-        if (entry.isIntersecting && entry.intersectionRatio > 0.5) v.play().catch(() => {});
-        else v.pause();
-      },
-      { threshold: [0, 0.51], rootMargin: "300px 0px" },
-    );
+    const io = new IntersectionObserver(([entry]) => entry?.isIntersecting && setLoad(true), {
+      rootMargin: "400px",
+    });
     io.observe(el);
     return () => io.disconnect();
-  }, [cardRef, videoRef, autoplay]);
+  }, [cardRef]);
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v || !load) return;
+    if (autoplay) v.play().catch(() => {});
+    else v.pause();
+  }, [autoplay, load, videoRef]);
 
   return load;
 }
@@ -44,64 +40,35 @@ const ProjectCard = memo(function ProjectCard({
   project,
   index,
   onOpen,
-  carousel = false,
-  active = false,
+  active,
 }: {
   project: Project;
   index: number;
   onOpen: (project: Project) => void;
-  carousel?: boolean;
-  active?: boolean;
+  active: boolean;
 }) {
   const isMobile = useIsMobile();
   const cardRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const shouldLoad = useLazyVideo(cardRef, videoRef, isMobile && active);
-
-  // pointer-driven 3D tilt (desktop only)
-  const px = useMotionValue(0);
-  const py = useMotionValue(0);
-  const rotateX = useSpring(useTransform(py, [-0.5, 0.5], [8, -8]), { stiffness: 220, damping: 18 });
-  const rotateY = useSpring(useTransform(px, [-0.5, 0.5], [-10, 10]), {
-    stiffness: 220,
-    damping: 18,
-  });
-
+  const shouldLoad = useLazyVideo(cardRef, videoRef, active);
   const open = useCallback(() => onOpen(project), [onOpen, project]);
 
   return (
-    <motion.article
+    <article
       ref={cardRef}
-      initial={carousel ? false : { opacity: 0, y: 60, scale: 0.94 }}
-      whileInView={carousel ? {} : { opacity: 1, y: 0, scale: 1 }}
-      viewport={viewportOnce}
-      transition={{ duration: 0.7, ease: EASE, delay: (index % 3) * 0.08 }}
       style={{ perspective: 1200 }}
-      className={
-        carousel
-          ? `group relative w-[82vw] shrink-0 snap-center transition-[transform,opacity] duration-300 ease-out will-change-transform ${
-              active ? "scale-100 opacity-100" : "scale-95 opacity-60"
-            }`
-          : "group relative"
-      }
+      className={`group relative w-[82vw] shrink-0 snap-center will-change-transform md:w-[42vw] lg:w-[36vw] ${
+        active ? "z-20" : "z-10"
+      }`}
     >
-      <motion.div
-        style={isMobile ? {} : { rotateX, rotateY, transformStyle: "preserve-3d" }}
-        onPointerMove={(e) => {
-          if (isMobile || e.pointerType !== "mouse") return;
-          const r = e.currentTarget.getBoundingClientRect();
-          px.set((e.clientX - r.left) / r.width - 0.5);
-          py.set((e.clientY - r.top) / r.height - 0.5);
-        }}
-        onPointerLeave={() => {
-          px.set(0);
-          py.set(0);
-        }}
-        whileHover={isMobile ? {} : { y: -6, scale: 1.01 }}
-        transition={{ type: "spring", stiffness: 400, damping: 24 }}
-        className="relative overflow-hidden rounded-3xl border border-border bg-card shadow-sm transition-shadow duration-200 hover:shadow-elevated"
+      <div
+        className={`relative overflow-hidden rounded-3xl border border-border bg-card shadow-sm transition-[transform,opacity,filter] duration-500 ease-out will-change-transform ${
+          active
+            ? "scale-[1.03] opacity-100 shadow-elevated"
+            : "scale-90 opacity-50 blur-[1.5px] md:blur-[2px]"
+        }`}
       >
-        {/* animated glow sweep */}
+        {/* glow sweep */}
         <span
           aria-hidden
           className="pointer-events-none absolute -inset-px z-20 hidden rounded-3xl opacity-0 transition-opacity duration-300 group-hover:opacity-100 md:block"
@@ -129,32 +96,32 @@ const ProjectCard = memo(function ProjectCard({
               playsInline
               preload="none"
               onMouseEnter={(e) => !isMobile && e.currentTarget.play().catch(() => {})}
-              onMouseLeave={(e) => !isMobile && e.currentTarget.pause()}
-              aria-label={`${project.title} preview`}
-              className={`size-full object-cover transition-transform duration-500 ease-out will-change-transform ${isMobile ? "" : "scale-105 group-hover:scale-110"}`}
+              onMouseLeave={(e) => !isMobile && active === false && e.currentTarget.pause()}
+              className={`size-full object-cover transition-transform duration-700 ease-out will-change-transform ${
+                active ? "scale-110" : "scale-100"
+              } md:group-hover:scale-[1.14]`}
             />
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent opacity-90" />
 
-            {carousel && (
-              <span
-                className={`pointer-events-none absolute bottom-4 left-4 right-4 flex items-center justify-between gap-2 rounded-full border border-white/10 bg-background/70 px-3 py-2 text-[10px] uppercase tracking-widest text-foreground/90 backdrop-blur-sm transition-opacity duration-300 ${
-                  active ? "opacity-100" : "opacity-0"
-                }`}
-              >
-                <span className="truncate">{project.tags[0]}</span>
-                <span className="flex shrink-0 items-center gap-1.5 text-primary">
-                  <span className="size-1.5 animate-ping rounded-full bg-primary" />
-                  Tap to preview
-                </span>
-              </span>
-            )}
+            {/* kinetic category badge */}
+            <span
+              className={`pointer-events-none absolute left-4 top-4 z-10 rounded-full border border-white/15 bg-black/45 px-3 py-1.5 text-[10px] uppercase tracking-widest text-foreground/90 backdrop-blur-md transition-all duration-300 ease-out ${
+                active ? "translate-y-0 scale-100 opacity-100" : "-translate-y-1 scale-90 opacity-0"
+              }`}
+            >
+              {project.tags[0]}
+            </span>
 
-            <span className="pointer-events-none absolute left-4 top-4 font-display text-4xl leading-none text-foreground/80 mix-blend-difference sm:text-5xl">
+            <span className="pointer-events-none absolute right-4 top-4 font-display text-4xl leading-none text-foreground/80 mix-blend-difference sm:text-5xl">
               {String(index + 1).padStart(2, "0")}
             </span>
 
             <span className="pointer-events-none absolute inset-0 grid place-items-center">
-              <span className="grid size-14 place-items-center rounded-full bg-primary/90 text-primary-foreground shadow-glow transition-all duration-200 md:opacity-0 md:group-hover:scale-110 md:group-hover:opacity-100">
+              <span
+                className={`grid size-14 place-items-center rounded-full bg-primary/90 text-primary-foreground shadow-glow transition-all duration-200 ${
+                  active ? "scale-100 opacity-100" : "scale-90 opacity-0"
+                } md:group-hover:scale-110 md:group-hover:opacity-100`}
+              >
                 <svg viewBox="0 0 24 24" className="ml-0.5 size-6" fill="currentColor" aria-hidden>
                   <path d="M8 5v14l11-7z" />
                 </svg>
@@ -191,8 +158,8 @@ const ProjectCard = memo(function ProjectCard({
             </button>
           </Magnetic>
         </div>
-      </motion.div>
-    </motion.article>
+      </div>
+    </article>
   );
 });
 
@@ -200,7 +167,6 @@ export function Projects() {
   const [active, setActive] = useState<Project | null>(null);
   const handleOpen = useCallback((p: Project) => setActive(p), []);
   const handleClose = useCallback(() => setActive(null), []);
-  const isMobile = useIsMobile();
   const trackRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [progress, setProgress] = useState(0);
@@ -209,16 +175,30 @@ export function Projects() {
 
   useEffect(() => {
     const el = trackRef.current;
-    if (!el || !isMobile) return;
+    if (!el) return;
     let raf = 0;
     const onScroll = () => {
       if (raf) return;
       raf = requestAnimationFrame(() => {
         raf = 0;
         const max = el.scrollWidth - el.clientWidth;
-        const p = max > 0 ? Math.min(1, Math.max(0, el.scrollLeft / max)) : 0;
-        setProgress(p);
-        setActiveIndex(Math.round(p * (projects.length - 1)));
+        setProgress(max > 0 ? Math.min(1, Math.max(0, el.scrollLeft / max)) : 0);
+
+        // nearest card to the horizontal centre of the viewport
+        const centre = el.scrollLeft + el.clientWidth / 2;
+        let best = 0;
+        let bestDist = Infinity;
+        Array.from(el.children).forEach((child, i) => {
+          const c = child as HTMLElement;
+          const cc = c.offsetLeft + c.offsetWidth / 2;
+          const d = Math.abs(cc - centre);
+          if (d < bestDist) {
+            bestDist = d;
+            best = i;
+          }
+        });
+        setActiveIndex(best);
+
         if (max > 0 && el.scrollLeft >= max - 2) {
           if (!endHit.current) {
             endHit.current = true;
@@ -233,68 +213,91 @@ export function Projects() {
     };
     onScroll();
     el.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
     return () => {
       el.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
       if (raf) cancelAnimationFrame(raf);
     };
-  }, [isMobile]);
+  }, []);
+
+  const step = useCallback((dir: -1 | 1) => {
+    const el = trackRef.current;
+    if (!el) return;
+    const card = el.children[0] as HTMLElement | undefined;
+    const w = card ? card.offsetWidth + 24 : el.clientWidth * 0.8;
+    el.scrollBy({ left: dir * w, behavior: "smooth" });
+  }, []);
 
   return (
-    <section id="work" className="mx-auto max-w-7xl scroll-mt-24 px-5 py-20 sm:px-8 sm:py-24">
+    <section id="work" className="scroll-mt-24 py-20 sm:py-24">
       <motion.div
         variants={stagger()}
         initial="hidden"
         whileInView="show"
         viewport={viewportOnce}
-        className="max-w-2xl"
+        className="mx-auto max-w-7xl px-5 sm:px-8"
       >
         <motion.p variants={fadeUp} className="text-xs uppercase tracking-[0.3em] text-primary">
           Selected work
         </motion.p>
-        <motion.h2 variants={fadeUp} className="mt-4 font-display text-4xl sm:text-6xl">
+        <motion.h2 variants={fadeUp} className="mt-4 max-w-2xl font-display text-4xl sm:text-6xl">
           Every cut, start to finish
         </motion.h2>
-        <motion.p variants={fadeUp} className="mt-4 text-muted-foreground">
+        <motion.p variants={fadeUp} className="mt-4 max-w-2xl text-muted-foreground">
           Every project below was shot and/or edited end to end — story, pacing, sound and grade.
         </motion.p>
       </motion.div>
 
-      {isMobile ? (
-        <div className="mt-10">
-          <div
-            ref={trackRef}
-            className={`no-scrollbar -mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-2 ${bounce ? "animate-edge-bounce" : ""}`}
-            style={{ scrollBehavior: "smooth" }}
-          >
-            {projects.map((p, i) => (
-              <ProjectCard
-                key={p.id}
-                project={p}
-                index={i}
-                onOpen={handleOpen}
-                carousel
-                active={i === activeIndex}
-              />
-            ))}
-          </div>
-          <div className="mt-5 h-[3px] w-full overflow-hidden rounded-full bg-secondary">
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-primary to-accent shadow-glow transition-[width] duration-150 ease-out"
-              style={{ width: `${Math.max(12, progress * 100)}%` }}
-            />
-          </div>
-          <p className="mt-3 text-[11px] uppercase tracking-widest text-muted-foreground">
-            {String(activeIndex + 1).padStart(2, "0")} / {String(projects.length).padStart(2, "0")}{" "}
-            — swipe to explore
-          </p>
-        </div>
-      ) : (
-        <div className="mt-12 grid gap-6 sm:mt-14 sm:gap-8 md:grid-cols-2 lg:grid-cols-3">
+      <div className="relative mt-10 sm:mt-14">
+        <div
+          ref={trackRef}
+          className={`no-scrollbar flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth px-[9vw] pb-4 md:px-[29vw] lg:px-[32vw] ${
+            bounce ? "animate-edge-bounce" : ""
+          }`}
+        >
           {projects.map((p, i) => (
-            <ProjectCard key={p.id} project={p} index={i} onOpen={handleOpen} />
+            <ProjectCard
+              key={p.id}
+              project={p}
+              index={i}
+              onOpen={handleOpen}
+              active={i === activeIndex}
+            />
           ))}
         </div>
-      )}
+
+        {/* desktop arrows */}
+        <button
+          type="button"
+          onClick={() => step(-1)}
+          aria-label="Previous project"
+          className="absolute left-4 top-1/2 z-30 hidden -translate-y-1/2 place-items-center rounded-full border border-white/10 bg-black/40 p-3 text-foreground backdrop-blur-md transition-all duration-200 hover:scale-105 hover:bg-black/70 active:scale-95 md:grid"
+        >
+          <ChevronLeft className="size-5" />
+        </button>
+        <button
+          type="button"
+          onClick={() => step(1)}
+          aria-label="Next project"
+          className="absolute right-4 top-1/2 z-30 hidden -translate-y-1/2 place-items-center rounded-full border border-white/10 bg-black/40 p-3 text-foreground backdrop-blur-md transition-all duration-200 hover:scale-105 hover:bg-black/70 active:scale-95 md:grid"
+        >
+          <ChevronRight className="size-5" />
+        </button>
+      </div>
+
+      <div className="mx-auto max-w-7xl px-5 sm:px-8">
+        <div className="mt-5 h-[3px] w-full overflow-hidden rounded-full bg-secondary">
+          <div
+            className="h-full origin-left rounded-full bg-gradient-to-r from-primary to-accent shadow-glow transition-transform duration-150 ease-out"
+            style={{ transform: `scaleX(${Math.max(0.12, progress || 0.12)})` }}
+          />
+        </div>
+        <p className="mt-3 text-[11px] uppercase tracking-widest text-muted-foreground">
+          {String(activeIndex + 1).padStart(2, "0")} / {String(projects.length).padStart(2, "0")} —
+          swipe or drag to explore
+        </p>
+      </div>
 
       <AnimatePresence>
         {active && (
