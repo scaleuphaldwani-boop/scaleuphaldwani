@@ -57,12 +57,12 @@ const ProjectCard = memo(function ProjectCard({
     <article
       ref={cardRef}
       style={{ perspective: 1200 }}
-      className={`group relative w-[82vw] shrink-0 snap-center will-change-transform md:w-[42vw] lg:w-[36vw] ${
+      className={`group relative h-[60vh] max-h-[480px] w-auto shrink-0 snap-center md:h-[520px] md:max-h-[520px] ${
         active ? "z-20" : "z-10"
       }`}
     >
       <div
-        className={`relative overflow-hidden rounded-3xl border border-border bg-card shadow-sm transition-[transform,opacity,filter] duration-500 ease-out will-change-transform ${
+        className={`relative flex h-full w-full flex-col overflow-hidden rounded-3xl border border-border bg-card shadow-sm transition-[transform,opacity,filter] duration-500 ease-out will-change-transform ${
           active
             ? "scale-[1.03] opacity-100 shadow-elevated"
             : "scale-90 opacity-50 blur-[1.5px] md:blur-[2px]"
@@ -84,9 +84,7 @@ const ProjectCard = memo(function ProjectCard({
           className="block w-full text-left transition-transform duration-150 active:scale-95"
           aria-label={`Play ${project.title}`}
         >
-          <div
-            className={`relative overflow-hidden bg-secondary ${project.vertical ? "aspect-[9/16]" : "aspect-video"}`}
-          >
+          <div className="relative flex aspect-[9/16] h-[75%] w-auto items-center justify-center self-center overflow-hidden rounded-2xl bg-secondary">
             <video
               ref={videoRef}
               src={shouldLoad ? project.video : undefined}
@@ -97,32 +95,31 @@ const ProjectCard = memo(function ProjectCard({
               preload="none"
               onMouseEnter={(e) => !isMobile && e.currentTarget.play().catch(() => {})}
               onMouseLeave={(e) => !isMobile && active === false && e.currentTarget.pause()}
-              className={`size-full object-cover transition-transform duration-700 ease-out will-change-transform ${
-                active ? "scale-110" : "scale-100"
-              } md:group-hover:scale-[1.14]`}
+              className={`h-full w-full object-contain transition-transform duration-700 ease-out will-change-transform ${
+                active ? "scale-105" : "scale-100"
+              } md:group-hover:scale-110`}
             />
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent opacity-90" />
 
             {/* kinetic category badge */}
             <span
-              className={`pointer-events-none absolute left-4 top-4 z-10 rounded-full border border-white/15 bg-black/45 px-3 py-1.5 text-[10px] uppercase tracking-widest text-foreground/90 backdrop-blur-md transition-all duration-300 ease-out ${
+              className={`pointer-events-none absolute left-3 top-3 z-10 rounded-full border border-white/15 bg-black/45 px-2.5 py-1 text-[9px] uppercase tracking-widest text-foreground/90 backdrop-blur-md transition-all duration-300 ease-out ${
                 active ? "translate-y-0 scale-100 opacity-100" : "-translate-y-1 scale-90 opacity-0"
               }`}
             >
               {project.tags[0]}
             </span>
 
-            <span className="pointer-events-none absolute right-4 top-4 font-display text-4xl leading-none text-foreground/80 mix-blend-difference sm:text-5xl">
+            <span className="pointer-events-none absolute right-3 top-3 font-display text-3xl leading-none text-foreground/80 mix-blend-difference sm:text-4xl">
               {String(index + 1).padStart(2, "0")}
             </span>
 
             <span className="pointer-events-none absolute inset-0 grid place-items-center">
               <span
-                className={`grid size-14 place-items-center rounded-full bg-primary/90 text-primary-foreground shadow-glow transition-all duration-200 ${
+                className={`grid size-12 place-items-center rounded-full bg-primary/90 text-primary-foreground shadow-glow transition-all duration-200 ${
                   active ? "scale-100 opacity-100" : "scale-90 opacity-0"
                 } md:group-hover:scale-110 md:group-hover:opacity-100`}
               >
-                <svg viewBox="0 0 24 24" className="ml-0.5 size-6" fill="currentColor" aria-hidden>
+                <svg viewBox="0 0 24 24" className="ml-0.5 size-5" fill="currentColor" aria-hidden>
                   <path d="M8 5v14l11-7z" />
                 </svg>
               </span>
@@ -130,26 +127,30 @@ const ProjectCard = memo(function ProjectCard({
           </div>
         </button>
 
-        <div className="p-5 sm:p-6">
+        <div className="flex flex-1 flex-col justify-center px-4 py-3 sm:px-5 sm:py-4">
           <div className="flex flex-wrap items-center gap-2">
-            {project.tags.map((t) => (
+            {project.tags.slice(0, 1).map((t) => (
               <span
                 key={t}
-                className="rounded-full border border-border bg-secondary px-3 py-1 text-[10px] uppercase tracking-widest text-muted-foreground sm:text-[11px]"
+                className="rounded-full border border-border bg-secondary px-2.5 py-1 text-[9px] uppercase tracking-widest text-muted-foreground sm:text-[10px]"
               >
                 {t}
               </span>
             ))}
           </div>
           <Magnetic strength={0.2}>
-            <h3 className="mt-4 font-display text-2xl tracking-wide">{project.title}</h3>
+            <h3 className="mt-2 font-display text-xl leading-tight tracking-wide sm:text-2xl">
+              {project.title}
+            </h3>
           </Magnetic>
-          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{project.description}</p>
+          <p className="mt-1 hidden text-xs leading-relaxed text-muted-foreground sm:line-clamp-2 sm:block sm:text-sm">
+            {project.description}
+          </p>
           <Magnetic strength={0.3}>
             <button
               type="button"
               onClick={open}
-              className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-primary transition-colors duration-200 hover:text-accent active:scale-95"
+              className="mt-2 inline-flex items-center gap-1.5 text-xs font-medium text-primary transition-colors duration-200 hover:text-accent active:scale-95 sm:mt-3 sm:text-sm"
             >
               Watch the cut
               <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-1">

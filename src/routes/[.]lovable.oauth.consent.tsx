@@ -10,7 +10,7 @@ type OAuthApi = {
   denyAuthorization: (id: string) => Promise<{ data: OAuthResult | null; error: Error | null }>;
 };
 
-const oauthApi = () => (supabase.auth as unknown as { oauth: OAuthApi }).oauth;
+export const oauthApi = () => (supabase.auth as unknown as { oauth: OAuthApi }).oauth;
 
 export const Route = createFileRoute("/.lovable/oauth/consent")({
   ssr: false,
