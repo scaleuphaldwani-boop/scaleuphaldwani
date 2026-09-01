@@ -75,8 +75,11 @@
   --secondary-foreground: oklch(0.97 0.005 90);
   --muted: oklch(0.25 0.014 250);
   --muted-foreground: oklch(0.72 0.014 250);
-  --accent: oklch(0.72 0.14 195);
-  --accent-foreground: oklch(0.16 0.02 200);
+  --accent: oklch(0.86 0.15 213);
+  --accent-foreground: oklch(0.15 0.03 230);
+  --ice: oklch(0.86 0.15 213);
+  --ice-soft: oklch(0.93 0.08 205);
+  --ice-deep: oklch(0.62 0.16 230);
   --destructive: oklch(0.6 0.22 25);
   --destructive-foreground: oklch(0.98 0.003 90);
   --border: oklch(1 0 0 / 10%);
@@ -100,21 +103,23 @@
   --font-body: "Sora", ui-sans-serif, system-ui, sans-serif;
   --gradient-hero: radial-gradient(
       60% 60% at 20% 20%,
-      color-mix(in oklab, var(--primary) 28%, transparent),
+      color-mix(in oklab, var(--primary) 26%, transparent),
       transparent 70%
     ),
     radial-gradient(
       55% 55% at 85% 30%,
-      color-mix(in oklab, var(--accent) 26%, transparent),
+      color-mix(in oklab, var(--ice) 34%, transparent),
       transparent 70%
     ),
     radial-gradient(
       70% 70% at 50% 95%,
-      color-mix(in oklab, var(--primary) 16%, transparent),
+      color-mix(in oklab, var(--ice-deep) 26%, transparent),
       transparent 70%
     );
   --shadow-elevated: 0 24px 60px -20px oklch(0 0 0 / 0.75);
   --shadow-glow: 0 0 44px -8px color-mix(in oklab, var(--primary) 55%, transparent);
+  --shadow-ice: 0 0 0 1px color-mix(in oklab, var(--ice) 26%, transparent),
+    0 0 28px -6px color-mix(in oklab, var(--ice) 60%, transparent);
 }
 
 @theme inline {
@@ -122,6 +127,10 @@
   --font-sans: var(--font-body);
   --shadow-elevated: var(--shadow-elevated);
   --shadow-glow: var(--shadow-glow);
+  --shadow-ice: var(--shadow-ice);
+  --color-ice: var(--ice);
+  --color-ice-soft: var(--ice-soft);
+  --color-ice-deep: var(--ice-deep);
 }
 
 @utility mesh-hero {
@@ -136,11 +145,40 @@
   background-image: linear-gradient(
     100deg,
     var(--foreground),
-    color-mix(in oklab, var(--primary) 85%, white)
+    color-mix(in oklab, var(--ice) 90%, white)
   );
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+@utility text-ice {
+  color: var(--ice);
+  text-shadow: 0 0 18px color-mix(in oklab, var(--ice) 45%, transparent);
+}
+
+@utility ice-glow {
+  box-shadow: var(--shadow-ice);
+}
+
+@utility ice-hairline {
+  border: 1px solid color-mix(in oklab, var(--ice) 24%, transparent);
+}
+
+@keyframes ice-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 1px color-mix(in oklab, var(--ice) 22%, transparent),
+      0 0 18px -8px color-mix(in oklab, var(--ice) 50%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 1px color-mix(in oklab, var(--ice) 45%, transparent),
+      0 0 34px -6px color-mix(in oklab, var(--ice) 75%, transparent);
+  }
+}
+
+@utility animate-ice-pulse {
+  animation: ice-pulse 3.2s ease-in-out infinite;
 }
 
 @keyframes drift {
