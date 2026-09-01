@@ -289,8 +289,6 @@ export function Projects() {
     const i = Math.min(COUNT - 1, Math.max(0, Math.round(-spring.get() / STEP)));
     setIndex(i);
     setRotation(-i * STEP);
-    spring.set(spring.get()); // keep current, animate via rotation effect
-    spring.jump?.(spring.get());
     spring.set(-i * STEP);
   };
 
@@ -350,7 +348,7 @@ export function Projects() {
             style={{ transformStyle: "preserve-3d" }}
           >
             {projects.map((p, i) => {
-              const d = Math.abs(delta(i * STEP, -rotation)) / 180;
+              const d = Math.abs(delta(i * STEP, index * STEP)) / 180;
               return (
                 <OrbitCard
                   key={p.id}
