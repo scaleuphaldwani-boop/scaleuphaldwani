@@ -210,13 +210,13 @@ export function Projects() {
       const vw = window.innerWidth;
       const vh = window.innerHeight;
       // card must fit height: video is 9:16 + ~110px of meta
-      const maxByHeight = ((Math.min(vh * 0.68, 620) - 110) * 9) / 16;
-      const maxByWidth = vw < 768 ? vw * 0.62 : Math.min(vw * 0.24, 320);
+      const maxByHeight = ((Math.min(vh * 0.72, 680) - 110) * 9) / 16;
+      const maxByWidth = vw < 768 ? vw * 0.62 : Math.min(vw * 0.30, 380);
       const width = Math.max(180, Math.min(maxByWidth, maxByHeight));
       const height = (width * 16) / 9 + 110;
       // ring radius keeps neighbours from colliding, scaled for small screens
       const base = width / 2 / Math.tan((Math.PI * STEP) / 360);
-      const radius = base * (vw < 768 ? 1.02 : 1.18);
+      const radius = base * (vw < 768 ? 1.02 : 1.22);
       setDims({ width, radius, height });
     };
     measure();
