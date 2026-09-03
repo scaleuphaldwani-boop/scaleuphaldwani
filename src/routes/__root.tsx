@@ -78,14 +78,21 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "Scaleup Haldwani | Video Editor & Cinematographer" },
+      {
+        name: "description",
+        content:
+          "Scaleup Haldwani — video editor and cinematographer crafting reels, brand films and ads with CapCut Pro, Premiere Pro and After Effects.",
+      },
+      { name: "author", content: "Scaleup Haldwani" },
+      { property: "og:title", content: "Scaleup Haldwani | Video Editor & Cinematographer" },
+      {
+        property: "og:description",
+        content:
+          "Scaleup Haldwani — video editor and cinematographer crafting reels, brand films and ads with CapCut Pro, Premiere Pro and After Effects.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
       {
