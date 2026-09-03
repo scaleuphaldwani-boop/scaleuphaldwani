@@ -157,7 +157,7 @@ const OrbitCard = memo(function OrbitCard({
             />
 
             <span
-              className={`pointer-events-none absolute left-3 top-3 z-10 rounded-full border border-white/15 bg-black/45 px-2.5 py-1 text-[9px] uppercase tracking-widest text-foreground/90 backdrop-blur-md transition-all duration-300 ease-out ${
+              className={`pointer-events-none absolute left-3 top-3 z-10 rounded-full border border-white/15 bg-black/60 px-2.5 py-1 text-[9px] uppercase tracking-widest text-foreground/90 transition-all duration-300 ease-out ${
                 active ? "translate-y-0 scale-100 opacity-100" : "-translate-y-1 scale-90 opacity-0"
               }`}
             >
@@ -298,7 +298,8 @@ export function Projects() {
     const min = -(COUNT - 1) * STEP - STEP * 0.35;
     const max = STEP * 0.35;
     spring.set(Math.max(min, Math.min(max, raw)));
-    setIndex(Math.round(-spring.get() / STEP));
+    const next = Math.min(COUNT - 1, Math.max(0, Math.round(-spring.get() / STEP)));
+    setIndex((i) => (i === next ? i : next));
   };
   const endDrag = () => {
     if (!drag.current.active) return;
@@ -387,7 +388,7 @@ export function Projects() {
           type="button"
           onClick={() => go(-1)}
           aria-label="Previous project"
-          className="absolute left-3 top-1/2 z-30 grid -translate-y-1/2 place-items-center rounded-full border border-white/10 bg-black/40 p-2.5 text-foreground backdrop-blur-md transition-all duration-200 hover:scale-105 hover:bg-black/70 active:scale-95 md:left-8 md:p-3"
+          className="absolute left-3 top-1/2 z-30 grid -translate-y-1/2 place-items-center rounded-full border border-white/10 bg-black/70 p-2.5 text-foreground transition-all duration-200 hover:scale-105 hover:bg-black/70 active:scale-95 md:left-8 md:p-3"
         >
           <ChevronLeft className="size-5" />
         </button>
@@ -395,7 +396,7 @@ export function Projects() {
           type="button"
           onClick={() => go(1)}
           aria-label="Next project"
-          className="absolute right-3 top-1/2 z-30 grid -translate-y-1/2 place-items-center rounded-full border border-white/10 bg-black/40 p-2.5 text-foreground backdrop-blur-md transition-all duration-200 hover:scale-105 hover:bg-black/70 active:scale-95 md:right-8 md:p-3"
+          className="absolute right-3 top-1/2 z-30 grid -translate-y-1/2 place-items-center rounded-full border border-white/10 bg-black/70 p-2.5 text-foreground transition-all duration-200 hover:scale-105 hover:bg-black/70 active:scale-95 md:right-8 md:p-3"
         >
           <ChevronRight className="size-5" />
         </button>

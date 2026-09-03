@@ -135,7 +135,6 @@
 
 @utility mesh-hero {
   background-image: var(--gradient-hero);
-  filter: blur(28px);
   will-change: transform;
   transform: translateZ(0);
   backface-visibility: hidden;
@@ -228,7 +227,6 @@
     radial-gradient(40% 32% at 88% 22%, color-mix(in oklab, var(--ice-deep) 14%, transparent), transparent 70%),
     radial-gradient(50% 38% at 50% 78%, color-mix(in oklab, var(--primary) 8%, transparent), transparent 70%),
     radial-gradient(38% 30% at 8% 88%, color-mix(in oklab, var(--ice) 9%, transparent), transparent 70%);
-  filter: blur(48px);
   will-change: transform;
   transform: translateZ(0);
 }
@@ -247,6 +245,14 @@
 
 @utility animate-aurora {
   animation: aurora-drift 34s ease-in-out infinite;
+}
+
+/* heavy ambient motion is desktop-only; phones keep the static gradient */
+@media (max-width: 767px) {
+  .animate-aurora,
+  .animate-drift {
+    animation: none !important;
+  }
 }
 
 @utility section-glow-top {
