@@ -66,20 +66,37 @@ const OrbitCard = memo(function OrbitCard({
 }) {
   const isMobile = useIsMobile();
   const cardRef = useRef<HTMLDivElement>(null);
+  const innerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const shouldLoad = useLazyVideo(cardRef, videoRef, active);
+  const near = depth < 0.4;
+  const shouldLoad = useLazyVideo(cardRef, videoRef, active) && near;
   const open = useCallback(() => onOpen(project), [onOpen, project]);
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  const tiltRaf = useRef(0);
 
-  const hidden = depth > 0.72;
+  const hidden = depth > 0.6;
+
+  const setTransform = (x: number, y: number) => {
+    const el = innerRef.current;
+    if (!el) return;
+    el.style.transform = `perspective(900px) rotateX(${x}deg) rotateY(${y}deg) scale(${
+      active ? 1 : 0.92
+    })`;
+  };
 
   const onPointerMove = (e: React.PointerEvent) => {
     if (isMobile || !active) return;
     const r = e.currentTarget.getBoundingClientRect();
     const px = (e.clientX - r.left) / r.width - 0.5;
     const py = (e.clientY - r.top) / r.height - 0.5;
-    setTilt({ x: -py * 9, y: px * 12 });
+    if (tiltRaf.current) return;
+    tiltRaf.current = requestAnimationFrame(() => {
+      tiltRaf.current = 0;
+      setTransform(-py * 9, px * 12);
+    });
   };
+
+  useEffect(() => setTransform(0, 0), [active]);
+  useEffect(() => () => cancelAnimationFrame(tiltRaf.current), []);
 
   return (
     <article
@@ -93,23 +110,23 @@ const OrbitCard = memo(function OrbitCard({
         zIndex: Math.round(100 - depth * 100),
         pointerEvents: active ? "auto" : "none",
         visibility: hidden ? "hidden" : "visible",
+        contentVisibility: hidden ? "hidden" : "visible",
       }}
     >
       <div
+        ref={innerRef}
         onPointerMove={onPointerMove}
-        onPointerLeave={() => setTilt({ x: 0, y: 0 })}
+        onPointerLeave={() => setTransform(0, 0)}
         className="group relative flex flex-col overflow-hidden rounded-3xl border border-border bg-card shadow-sm will-change-transform"
         style={{
-          transform: `perspective(900px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale(${
-            active ? 1 : 0.92
-          })`,
-          opacity: Math.max(0.18, 1 - depth * 1.35),
-          filter: active ? "none" : `blur(${Math.min(4, depth * 6)}px) saturate(0.7)`,
+          transform: `perspective(900px) scale(${active ? 1 : 0.92})`,
+          opacity: Math.max(0.22, 1 - depth * 1.5),
           transition:
-            "transform 260ms cubic-bezier(0.22,1,0.36,1), opacity 320ms ease-out, filter 320ms ease-out, box-shadow 260ms ease-out",
+            "transform 260ms cubic-bezier(0.22,1,0.36,1), opacity 320ms ease-out, box-shadow 260ms ease-out",
           boxShadow: active ? "var(--shadow-elevated)" : "none",
         }}
       >
+
         <span
           aria-hidden
           className="pointer-events-none absolute -inset-px z-20 hidden rounded-3xl opacity-0 transition-opacity duration-300 group-hover:opacity-100 md:block"
