@@ -46,7 +46,7 @@ function whatsappHref(text: string) {
 
 export function Pricing() {
   return (
-    <section id="pricing" className="relative scroll-mt-24 border-y border-border bg-card/20 py-24 backdrop-blur-[2px]">
+    <section id="pricing" className="relative scroll-mt-24 border-y border-border bg-card/20 py-24">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         <motion.div
           variants={stagger()}

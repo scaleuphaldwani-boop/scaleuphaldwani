@@ -35,7 +35,7 @@ function Index() {
       <div aria-hidden className="pointer-events-none fixed inset-0 z-0">
         <div className="aurora-page animate-aurora absolute inset-[-10%]" />
         <div className="bg-grid-fade absolute inset-0" />
-        <div className="bg-grain absolute inset-0" />
+        <div className="bg-grain absolute inset-0 hidden md:block" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_120%_90%_at_50%_50%,transparent_55%,color-mix(in_oklab,var(--background)_70%,transparent))]" />
       </div>
 

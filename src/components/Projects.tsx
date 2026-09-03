@@ -66,20 +66,37 @@ const OrbitCard = memo(function OrbitCard({
 }) {
   const isMobile = useIsMobile();
   const cardRef = useRef<HTMLDivElement>(null);
+  const innerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const shouldLoad = useLazyVideo(cardRef, videoRef, active);
+  const near = depth < 0.4;
+  const shouldLoad = useLazyVideo(cardRef, videoRef, active) && near;
   const open = useCallback(() => onOpen(project), [onOpen, project]);
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  const tiltRaf = useRef(0);
 
-  const hidden = depth > 0.72;
+  const hidden = depth > 0.6;
+
+  const setTransform = (x: number, y: number) => {
+    const el = innerRef.current;
+    if (!el) return;
+    el.style.transform = `perspective(900px) rotateX(${x}deg) rotateY(${y}deg) scale(${
+      active ? 1 : 0.92
+    })`;
+  };
 
   const onPointerMove = (e: React.PointerEvent) => {
     if (isMobile || !active) return;
     const r = e.currentTarget.getBoundingClientRect();
     const px = (e.clientX - r.left) / r.width - 0.5;
     const py = (e.clientY - r.top) / r.height - 0.5;
-    setTilt({ x: -py * 9, y: px * 12 });
+    if (tiltRaf.current) return;
+    tiltRaf.current = requestAnimationFrame(() => {
+      tiltRaf.current = 0;
+      setTransform(-py * 9, px * 12);
+    });
   };
+
+  useEffect(() => setTransform(0, 0), [active]);
+  useEffect(() => () => cancelAnimationFrame(tiltRaf.current), []);
 
   return (
     <article
@@ -93,23 +110,23 @@ const OrbitCard = memo(function OrbitCard({
         zIndex: Math.round(100 - depth * 100),
         pointerEvents: active ? "auto" : "none",
         visibility: hidden ? "hidden" : "visible",
+        contentVisibility: hidden ? "hidden" : "visible",
       }}
     >
       <div
+        ref={innerRef}
         onPointerMove={onPointerMove}
-        onPointerLeave={() => setTilt({ x: 0, y: 0 })}
+        onPointerLeave={() => setTransform(0, 0)}
         className="group relative flex flex-col overflow-hidden rounded-3xl border border-border bg-card shadow-sm will-change-transform"
         style={{
-          transform: `perspective(900px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale(${
-            active ? 1 : 0.92
-          })`,
-          opacity: Math.max(0.18, 1 - depth * 1.35),
-          filter: active ? "none" : `blur(${Math.min(4, depth * 6)}px) saturate(0.7)`,
+          transform: `perspective(900px) scale(${active ? 1 : 0.92})`,
+          opacity: Math.max(0.22, 1 - depth * 1.5),
           transition:
-            "transform 260ms cubic-bezier(0.22,1,0.36,1), opacity 320ms ease-out, filter 320ms ease-out, box-shadow 260ms ease-out",
+            "transform 260ms cubic-bezier(0.22,1,0.36,1), opacity 320ms ease-out, box-shadow 260ms ease-out",
           boxShadow: active ? "var(--shadow-elevated)" : "none",
         }}
       >
+
         <span
           aria-hidden
           className="pointer-events-none absolute -inset-px z-20 hidden rounded-3xl opacity-0 transition-opacity duration-300 group-hover:opacity-100 md:block"
@@ -140,7 +157,7 @@ const OrbitCard = memo(function OrbitCard({
             />
 
             <span
-              className={`pointer-events-none absolute left-3 top-3 z-10 rounded-full border border-white/15 bg-black/45 px-2.5 py-1 text-[9px] uppercase tracking-widest text-foreground/90 backdrop-blur-md transition-all duration-300 ease-out ${
+              className={`pointer-events-none absolute left-3 top-3 z-10 rounded-full border border-white/15 bg-black/60 px-2.5 py-1 text-[9px] uppercase tracking-widest text-foreground/90 transition-all duration-300 ease-out ${
                 active ? "translate-y-0 scale-100 opacity-100" : "-translate-y-1 scale-90 opacity-0"
               }`}
             >
@@ -281,7 +298,8 @@ export function Projects() {
     const min = -(COUNT - 1) * STEP - STEP * 0.35;
     const max = STEP * 0.35;
     spring.set(Math.max(min, Math.min(max, raw)));
-    setIndex(Math.round(-spring.get() / STEP));
+    const next = Math.min(COUNT - 1, Math.max(0, Math.round(-spring.get() / STEP)));
+    setIndex((i) => (i === next ? i : next));
   };
   const endDrag = () => {
     if (!drag.current.active) return;
@@ -370,7 +388,7 @@ export function Projects() {
           type="button"
           onClick={() => go(-1)}
           aria-label="Previous project"
-          className="absolute left-3 top-1/2 z-30 grid -translate-y-1/2 place-items-center rounded-full border border-white/10 bg-black/40 p-2.5 text-foreground backdrop-blur-md transition-all duration-200 hover:scale-105 hover:bg-black/70 active:scale-95 md:left-8 md:p-3"
+          className="absolute left-3 top-1/2 z-30 grid -translate-y-1/2 place-items-center rounded-full border border-white/10 bg-black/70 p-2.5 text-foreground transition-all duration-200 hover:scale-105 hover:bg-black/70 active:scale-95 md:left-8 md:p-3"
         >
           <ChevronLeft className="size-5" />
         </button>
@@ -378,7 +396,7 @@ export function Projects() {
           type="button"
           onClick={() => go(1)}
           aria-label="Next project"
-          className="absolute right-3 top-1/2 z-30 grid -translate-y-1/2 place-items-center rounded-full border border-white/10 bg-black/40 p-2.5 text-foreground backdrop-blur-md transition-all duration-200 hover:scale-105 hover:bg-black/70 active:scale-95 md:right-8 md:p-3"
+          className="absolute right-3 top-1/2 z-30 grid -translate-y-1/2 place-items-center rounded-full border border-white/10 bg-black/70 p-2.5 text-foreground transition-all duration-200 hover:scale-105 hover:bg-black/70 active:scale-95 md:right-8 md:p-3"
         >
           <ChevronRight className="size-5" />
         </button>
