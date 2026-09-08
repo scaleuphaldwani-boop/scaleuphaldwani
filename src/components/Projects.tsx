@@ -295,21 +295,19 @@ export function Projects() {
     const dx = e.clientX - drag.current.startX;
     drag.current.moved = Math.abs(dx);
     const per = Math.max(120, dims.width * 0.8); // px per card step
-    const raw = drag.current.startRot + (dx / per) * STEP;
-    const min = -(COUNT - 1) * STEP - STEP * 0.35;
-    const max = STEP * 0.35;
-    spring.set(Math.max(min, Math.min(max, raw)));
-    const next = Math.min(COUNT - 1, Math.max(0, Math.round(-spring.get() / STEP)));
+    spring.set(drag.current.startRot + (dx / per) * STEP);
+    const next = Math.round(-spring.get() / STEP);
     setIndex((i) => (i === next ? i : next));
   };
   const endDrag = () => {
     if (!drag.current.active) return;
     drag.current.active = false;
-    const i = Math.min(COUNT - 1, Math.max(0, Math.round(-spring.get() / STEP)));
+    const i = Math.round(-spring.get() / STEP);
     setIndex(i);
     setRotation(-i * STEP);
     spring.set(-i * STEP);
   };
+
 
   /* wheel navigation (horizontal or shift+wheel) */
   useEffect(() => {
