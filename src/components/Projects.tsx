@@ -367,14 +367,15 @@ export function Projects() {
             style={{ transformStyle: "preserve-3d" }}
           >
             {projects.map((p, i) => {
-              const d = Math.abs(delta(i * STEP, index * STEP)) / 180;
+              const d = Math.abs(delta(i * STEP, pos * STEP)) / 180;
               return (
                 <OrbitCard
                   key={p.id}
                   project={p}
                   index={i}
                   onOpen={handleOpen}
-                  active={i === index}
+                  active={i === pos}
+
                   angle={i * STEP}
                   radius={dims.radius}
                   width={dims.width}
