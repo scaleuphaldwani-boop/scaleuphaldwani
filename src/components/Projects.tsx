@@ -262,12 +262,13 @@ export function Projects() {
 
   const go = useCallback((dir: -1 | 1) => {
     setIndex((i) => {
-      const next = Math.min(COUNT - 1, Math.max(0, i + dir));
-      if (next !== i) navigator.vibrate?.(8);
+      const next = i + dir;
+      navigator.vibrate?.(8);
       setRotation(-next * STEP);
       return next;
     });
   }, []);
+
 
   /* keyboard */
   useEffect(() => {
