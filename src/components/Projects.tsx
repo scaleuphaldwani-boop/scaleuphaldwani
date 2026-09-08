@@ -327,7 +327,9 @@ export function Projects() {
     return () => el.removeEventListener("wheel", onWheel);
   }, [go]);
 
-  const progress = COUNT > 1 ? index / (COUNT - 1) : 1;
+  const pos = ((index % COUNT) + COUNT) % COUNT;
+  const progress = COUNT > 1 ? pos / (COUNT - 1) : 1;
+
 
   return (
     <section id="work" className="scroll-mt-24 overflow-hidden py-20 sm:py-24">
