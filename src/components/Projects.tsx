@@ -262,12 +262,13 @@ export function Projects() {
 
   const go = useCallback((dir: -1 | 1) => {
     setIndex((i) => {
-      const next = Math.min(COUNT - 1, Math.max(0, i + dir));
-      if (next !== i) navigator.vibrate?.(8);
+      const next = i + dir;
+      navigator.vibrate?.(8);
       setRotation(-next * STEP);
       return next;
     });
   }, []);
+
 
   /* keyboard */
   useEffect(() => {
@@ -294,21 +295,19 @@ export function Projects() {
     const dx = e.clientX - drag.current.startX;
     drag.current.moved = Math.abs(dx);
     const per = Math.max(120, dims.width * 0.8); // px per card step
-    const raw = drag.current.startRot + (dx / per) * STEP;
-    const min = -(COUNT - 1) * STEP - STEP * 0.35;
-    const max = STEP * 0.35;
-    spring.set(Math.max(min, Math.min(max, raw)));
-    const next = Math.min(COUNT - 1, Math.max(0, Math.round(-spring.get() / STEP)));
+    spring.set(drag.current.startRot + (dx / per) * STEP);
+    const next = Math.round(-spring.get() / STEP);
     setIndex((i) => (i === next ? i : next));
   };
   const endDrag = () => {
     if (!drag.current.active) return;
     drag.current.active = false;
-    const i = Math.min(COUNT - 1, Math.max(0, Math.round(-spring.get() / STEP)));
+    const i = Math.round(-spring.get() / STEP);
     setIndex(i);
     setRotation(-i * STEP);
     spring.set(-i * STEP);
   };
+
 
   /* wheel navigation (horizontal or shift+wheel) */
   useEffect(() => {
@@ -328,7 +327,9 @@ export function Projects() {
     return () => el.removeEventListener("wheel", onWheel);
   }, [go]);
 
-  const progress = COUNT > 1 ? index / (COUNT - 1) : 1;
+  const pos = ((index % COUNT) + COUNT) % COUNT;
+  const progress = COUNT > 1 ? pos / (COUNT - 1) : 1;
+
 
   return (
     <section id="work" className="scroll-mt-24 overflow-hidden py-20 sm:py-24">
@@ -366,14 +367,15 @@ export function Projects() {
             style={{ transformStyle: "preserve-3d" }}
           >
             {projects.map((p, i) => {
-              const d = Math.abs(delta(i * STEP, index * STEP)) / 180;
+              const d = Math.abs(delta(i * STEP, pos * STEP)) / 180;
               return (
                 <OrbitCard
                   key={p.id}
                   project={p}
                   index={i}
                   onOpen={handleOpen}
-                  active={i === index}
+                  active={i === pos}
+
                   angle={i * STEP}
                   radius={dims.radius}
                   width={dims.width}
@@ -410,7 +412,7 @@ export function Projects() {
           />
         </div>
         <p className="mt-3 text-[11px] uppercase tracking-widest text-muted-foreground">
-          {String(index + 1).padStart(2, "0")} / {String(COUNT).padStart(2, "0")} — drag, swipe or
+          {String(pos + 1).padStart(2, "0")} / {String(COUNT).padStart(2, "0")} — drag, swipe or
           use the arrows
         </p>
       </div>
