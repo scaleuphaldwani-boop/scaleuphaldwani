@@ -412,7 +412,7 @@ export function Projects() {
           />
         </div>
         <p className="mt-3 text-[11px] uppercase tracking-widest text-muted-foreground">
-          {String(index + 1).padStart(2, "0")} / {String(COUNT).padStart(2, "0")} — drag, swipe or
+          {String(pos + 1).padStart(2, "0")} / {String(COUNT).padStart(2, "0")} — drag, swipe or
           use the arrows
         </p>
       </div>
