@@ -43,7 +43,7 @@ export function Process() {
           viewport={viewportOnce}
           className="max-w-2xl"
         >
-          <motion.p variants={fadeUp} className="text-xs uppercase tracking-[0.3em] text-accent">
+          <motion.p variants={fadeUp} className="text-xs uppercase tracking-[0.3em] text-primary">
             The process
           </motion.p>
           <motion.h2 variants={fadeUp} className="mt-4 font-display text-5xl sm:text-6xl">
@@ -81,7 +81,7 @@ export function Process() {
                 >
                   <div className="flex items-baseline gap-4">
                     <span className="font-display text-2xl text-primary">{s.n}</span>
-                    <span className="font-display text-2xl tracking-wide">{s.title}</span>
+                    <span className="font-display text-2xl font-bold">{s.title}</span>
                   </div>
                   <motion.p
                     initial={false}

@@ -62,7 +62,7 @@ export function Contact() {
     <section id="contact" className="scroll-mt-24 border-t border-border py-24">
       <div className="mx-auto grid max-w-7xl gap-14 px-5 sm:px-8 lg:grid-cols-2">
         <motion.div variants={stagger()} initial="hidden" whileInView="show" viewport={viewportOnce}>
-          <motion.p variants={fadeUp} className="text-xs uppercase tracking-[0.3em] text-accent">
+          <motion.p variants={fadeUp} className="text-xs uppercase tracking-[0.3em] text-primary">
             Contact
           </motion.p>
           <motion.h2 variants={fadeUp} className="mt-4 font-display text-5xl sm:text-6xl">
