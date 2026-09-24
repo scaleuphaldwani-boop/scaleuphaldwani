@@ -15,7 +15,7 @@ export function Footer() {
             href="https://www.instagram.com/scaleuphaldwani/?hl=en"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 transition-all duration-200 hover:-translate-y-1 hover:border-pink-500/40 hover:text-foreground"
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 transition-all duration-200 hover:-translate-y-1 hover:border-primary/50 hover:text-foreground"
           >
             <Instagram className="size-4" />
             <span>@scaleuphaldwani</span>

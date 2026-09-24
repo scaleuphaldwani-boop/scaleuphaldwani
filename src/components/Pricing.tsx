@@ -46,96 +46,66 @@ function whatsappHref(text: string) {
 
 export function Pricing() {
   return (
-    <section id="pricing" className="relative scroll-mt-24 border-y border-border bg-card/20 py-24">
-      <div className="mx-auto max-w-7xl px-5 sm:px-8">
-        <motion.div
-          variants={stagger()}
-          initial="hidden"
-          whileInView="show"
-          viewport={viewportOnce}
-          className="max-w-2xl"
-        >
-          <motion.p variants={fadeUp} className="text-xs uppercase tracking-[0.3em] text-primary">
-            Pricing
-          </motion.p>
-          <motion.h2 variants={fadeUp} className="mt-4 font-display text-4xl sm:text-6xl">
-            Simple, upfront rates
-          </motion.h2>
-          <motion.p variants={fadeUp} className="mt-4 text-muted-foreground">
-            Pick a package that fits your content goals. Need something custom? Every plan can be
-            tailored to your shoot and delivery needs.
+    <section id="pricing" className="relative scroll-mt-24 py-24">
+      <div className="mx-auto max-w-7xl px-4 sm:px-8">
+        <motion.div variants={stagger()} initial="hidden" whileInView="show" viewport={viewportOnce} className="mb-12 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+          <motion.h2 variants={fadeUp} className="text-4xl sm:text-6xl">Simple, upfront rates</motion.h2>
+          <motion.p variants={fadeUp} className="max-w-sm text-sm text-muted-foreground">
+            Every package can be tailored to your shoot and delivery needs.
           </motion.p>
         </motion.div>
 
-        <motion.div
-          variants={stagger(0.12)}
-          initial="hidden"
-          whileInView="show"
-          viewport={viewportOnce}
-          className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
-        >
-          {plans.map((plan) => (
-            <motion.div
-              key={plan.name}
-              variants={revealCard}
-              whileHover={{ y: -6, scale: 1.01 }}
-              transition={{ type: "spring", stiffness: 400, damping: 24 }}
-              className={`relative flex flex-col rounded-3xl border p-7 transition-shadow duration-300 hover:shadow-elevated sm:p-8 ${
-                plan.featured
-                  ? "border-primary/40 bg-card shadow-[0_0_60px_-24px_color-mix(in_oklab,var(--primary)_30%,transparent)]"
-                  : "border-border bg-card/60"
-              }`}
-            >
-              {plan.featured && (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-4 py-1 text-xs font-semibold tracking-wide text-primary-foreground shadow-glow">
-                  Featured / Popular
-                </span>
-              )}
-
-              <div className="mb-6">
-                <h3 className="font-display text-3xl tracking-wide">{plan.name}</h3>
-                <div className="mt-3 flex items-baseline gap-2">
-                  <span className="font-display text-4xl text-foreground">{plan.price}</span>
-                  <span className="text-sm text-muted-foreground">{plan.note}</span>
+        <motion.div variants={stagger(0.12)} initial="hidden" whileInView="show" viewport={viewportOnce} className="grid gap-4 md:grid-cols-3 md:gap-6">
+          {plans.map((plan) => {
+            const f = plan.featured;
+            return (
+              <motion.div
+                key={plan.name}
+                variants={revealCard}
+                whileHover={{ y: -8, rotate: f ? 0 : -0.6 }}
+                transition={{ type: "spring", stiffness: 380, damping: 22 }}
+                className={`relative flex flex-col justify-between rounded-[2rem] p-8 ${
+                  f ? "bg-bone text-ink shadow-glow" : "border border-border bg-card transition-colors hover:border-primary/40"
+                }`}
+              >
+                {f && (
+                  <span className="absolute right-8 top-6 rounded-full bg-primary px-3 py-1 text-[10px] font-bold uppercase text-primary-foreground">
+                    Most popular
+                  </span>
+                )}
+                <div>
+                  <h3 className="text-2xl">{plan.name}</h3>
+                  <p className={`mt-1 text-xs uppercase tracking-widest ${f ? "text-ink/50" : "text-muted-foreground"}`}>{plan.note}</p>
+                  <p className="mt-5 font-display text-5xl font-bold tracking-tight">{plan.price}</p>
+                  <ul className="mt-8 space-y-3">
+                    {plan.highlights.map((item) => (
+                      <li key={item} className={`flex items-center gap-3 text-sm ${f ? "text-ink/70" : "text-muted-foreground"}`}>
+                        <span className="size-1.5 shrink-0 rounded-full bg-primary" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-              </div>
-
-              <ul className="flex-1 space-y-3">
-                {plan.highlights.map((item) => (
-                  <li key={item} className="flex items-start gap-3 text-sm text-muted-foreground">
-                    <span className="mt-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                      <svg viewBox="0 0 24 24" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="3">
-                        <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    </span>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-
-              <div className="mt-8 space-y-3">
-                <Magnetic strength={0.2}>
-                  <motion.a
-                    href={whatsappHref(plan.whatsappText)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    whileHover={{ y: -4, scale: 1.01 }}
-                    whileTap={{ scale: 0.95 }}
-                    transition={{ type: "spring", stiffness: 420, damping: 22 }}
-                    className="block w-full rounded-full bg-primary px-5 py-3.5 text-center text-sm font-semibold text-primary-foreground shadow-glow transition-shadow duration-200"
-                  >
-                    Get Custom Quote
-                  </motion.a>
-                </Magnetic>
-                <a
-                  href="#contact"
-                  className="block w-full text-center text-xs text-muted-foreground transition-colors duration-200 hover:text-foreground"
-                >
-                  or use the contact form
-                </a>
-              </div>
-            </motion.div>
-          ))}
+                <div className="mt-10 space-y-3">
+                  <Magnetic strength={0.15} className="w-full">
+                    <a
+                      href={whatsappHref(plan.whatsappText)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`block w-full rounded-xl py-4 text-center text-sm font-bold transition-colors ${
+                        f ? "bg-ink text-bone hover:bg-primary" : "border border-border hover:bg-bone hover:text-ink"
+                      }`}
+                    >
+                      Get Custom Quote
+                    </a>
+                  </Magnetic>
+                  <a href="#contact" className={`block text-center text-xs transition-colors ${f ? "text-ink/50 hover:text-ink" : "text-muted-foreground hover:text-foreground"}`}>
+                    or use the contact form
+                  </a>
+                </div>
+              </motion.div>
+            );
+          })}
         </motion.div>
       </div>
     </section>
