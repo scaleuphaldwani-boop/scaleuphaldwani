@@ -2,98 +2,101 @@ import { motion } from "framer-motion";
 import { Magnetic } from "./Magnetic";
 import { EASE } from "@/lib/motion";
 
-const container = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.14, delayChildren: 0.15 } },
-};
+const letters = (word: string, delay: number, cls = "") =>
+  word.split("").map((ch, i) => (
+    <span key={i} className="inline-block overflow-hidden align-bottom">
+      <motion.span
+        className={`inline-block ${cls}`}
+        initial={{ y: "110%" }}
+        animate={{ y: "0%" }}
+        transition={{ duration: 0.9, ease: EASE, delay: delay + i * 0.045 }}
+      >
+        {ch}
+      </motion.span>
+    </span>
+  ));
 
-const item = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE } },
-};
-
-const spring = { type: "spring" as const, stiffness: 420, damping: 22 };
+const ticker = ["Reels", "Brand films", "Ads", "Cinematography", "Colour grade", "Motion graphics", "Sound design"];
 
 export function Hero() {
   return (
-    <section id="top" className="relative overflow-hidden pt-36 pb-24 sm:pt-44 sm:pb-32">
-      <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="mesh-hero animate-drift absolute inset-[-20%]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,transparent,var(--background)_78%)]" />
-      </div>
-
-      <motion.div
-        variants={container}
-        initial="hidden"
-        animate="show"
-        className="mx-auto max-w-7xl px-5 sm:px-8"
-      >
-        <motion.p
-          variants={item}
-          className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-4 py-1.5 text-xs uppercase tracking-[0.25em] text-muted-foreground"
+    <section id="top" className="relative overflow-hidden pt-32 sm:pt-44">
+      <div className="mx-auto max-w-7xl px-4 sm:px-8">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6 }}
+          className="mb-8 flex items-center gap-3 text-xs uppercase tracking-[0.3em] text-muted-foreground"
         >
-          <span className="size-2 animate-pulse rounded-full bg-primary" />
-          Video Editor &middot; Cinematographer &middot; Haldwani
-        </motion.p>
-
-        <motion.h1
-          variants={item}
-          className="mt-7 max-w-4xl font-display text-6xl leading-[0.92] sm:text-8xl lg:text-[8.5rem]"
-        >
-          <span className="text-gradient">Frames that</span>
-          <br />
-          <span className="text-primary">make people stop</span>
-          <span className="text-foreground"> scrolling.</span>
-        </motion.h1>
-
-        <motion.p variants={item} className="mt-7 max-w-xl text-base text-muted-foreground sm:text-lg">
-          I&apos;m Scaleup Haldwani — I edit reels, brand films and ads with CapCut Pro,
-          Premiere Pro and After Effects, and shoot cinematography that actually earns
-          the cut.
-        </motion.p>
-
-        <motion.div variants={item} className="mt-10 flex flex-wrap items-center gap-4">
-          <Magnetic strength={0.25}>
-            <motion.a
-              href="#work"
-              whileHover={{ y: -4, scale: 1.01 }}
-              whileTap={{ scale: 0.95 }}
-              transition={spring}
-              className="inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground shadow-glow"
-            >
-              View my work
-            </motion.a>
-          </Magnetic>
-          <Magnetic strength={0.25}>
-            <motion.a
-              href="#contact"
-              whileHover={{ y: -4, scale: 1.01 }}
-              whileTap={{ scale: 0.95 }}
-              transition={spring}
-              className="inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-7 py-3.5 text-sm font-semibold text-foreground transition-shadow duration-200 hover:shadow-lg"
-            >
-              Start a project
-            </motion.a>
-          </Magnetic>
+          <span className="size-2 animate-rec rounded-full bg-primary" />
+          REC · Video Editor & Cinematographer · Haldwani
         </motion.div>
 
-        <motion.ul
-          variants={item}
-          className="mt-16 grid max-w-3xl grid-cols-2 gap-x-8 gap-y-6 border-t border-border pt-8 sm:grid-cols-4"
-        >
-          {[
-            ["7+", "Featured edits"],
-            ["4", "Tools mastered"],
-            ["48h", "Avg. turnaround"],
-            ["100%", "Hands-on grade"],
-          ].map(([value, label]) => (
-            <li key={label}>
-              <div className="font-display text-3xl text-primary">{value}</div>
-              <div className="text-xs uppercase tracking-widest text-muted-foreground">{label}</div>
-            </li>
+        <h1 className="text-[18vw] leading-[0.85] sm:text-[9rem] lg:text-[11rem]">
+          <span className="block">{letters("VISUAL", 0.1)}</span>
+          <span className="block">{letters("ARCHITECT.", 0.4, "text-red-fade")}</span>
+        </h1>
+
+        <div className="mt-10 flex flex-col items-start justify-between gap-8 md:flex-row md:items-end">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: EASE, delay: 0.9 }}
+            className="max-w-md"
+          >
+            <p className="text-lg leading-relaxed text-muted-foreground">
+              I&apos;m <span className="font-semibold text-foreground">Scaleup Haldwani</span> —
+              elevating digital storytelling through high-octane cinematography and precision
+              editing. Based in Haldwani, crafting worldwide.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Magnetic strength={0.25}>
+                <a
+                  href="#work"
+                  className="inline-flex rounded-full bg-primary px-7 py-3.5 text-sm font-bold text-primary-foreground shadow-glow transition-transform hover:-translate-y-1"
+                >
+                  View reels
+                </a>
+              </Magnetic>
+              <Magnetic strength={0.25}>
+                <a
+                  href="#contact"
+                  className="inline-flex rounded-full border border-border px-7 py-3.5 text-sm font-bold transition-colors hover:bg-bone hover:text-ink"
+                >
+                  Start a project
+                </a>
+              </Magnetic>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, ease: EASE, delay: 1.05 }}
+            className="grid grid-cols-2 gap-3"
+          >
+            <div className="rounded-2xl border border-border bg-card px-6 py-4">
+              <p className="mb-1 text-xs uppercase text-muted-foreground">Tools</p>
+              <p className="text-sm font-medium">Premiere Pro / After Effects / CapCut Pro</p>
+            </div>
+            <div className="rounded-2xl bg-bone px-6 py-4 text-ink">
+              <p className="font-display text-3xl font-bold leading-none">48h</p>
+              <p className="mt-1 text-xs uppercase opacity-60">Avg. turnaround</p>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+
+      <div className="mt-20 overflow-hidden border-y border-border py-5">
+        <div className="animate-marquee flex w-max gap-10 whitespace-nowrap font-display text-2xl font-bold uppercase sm:text-4xl">
+          {[...ticker, ...ticker].map((t, i) => (
+            <span key={i} className="flex items-center gap-10">
+              {t}
+              <span className="size-2.5 rounded-full bg-primary" />
+            </span>
           ))}
-        </motion.ul>
-      </motion.div>
+        </div>
+      </div>
     </section>
   );
 }
