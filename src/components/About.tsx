@@ -44,9 +44,9 @@ export function About() {
               variants={revealCard}
               whileHover={{ y: -4, scale: 1.01 }}
               transition={{ type: "spring", stiffness: 400, damping: 24 }}
-              className="rounded-2xl border border-border bg-card p-6 transition-shadow duration-200 hover:shadow-lg"
+              className="rounded-3xl border border-border bg-card p-6 transition-colors duration-300 first:bg-primary first:text-primary-foreground hover:border-primary/50"
             >
-              <div className="font-display text-2xl tracking-wide">{t.name}</div>
+              <div className="font-display text-2xl font-bold">{t.name}</div>
               <div className="mt-1 text-sm text-muted-foreground">{t.note}</div>
             </motion.li>
           ))}

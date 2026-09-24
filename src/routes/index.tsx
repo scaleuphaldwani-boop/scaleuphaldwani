@@ -33,10 +33,8 @@ function Index() {
     <div className="relative min-h-screen overflow-x-clip bg-background text-foreground">
       {/* Global premium background: drifting ice aurora + blueprint grid + film grain */}
       <div aria-hidden className="pointer-events-none fixed inset-0 z-0">
-        <div className="aurora-page animate-aurora absolute inset-[-10%]" />
-        <div className="bg-grid-fade absolute inset-0" />
+        <div className="absolute -top-40 left-1/2 h-[600px] w-[900px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--primary)_18%,transparent),transparent)]" />
         <div className="bg-grain absolute inset-0 hidden md:block" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_120%_90%_at_50%_50%,transparent_55%,color-mix(in_oklab,var(--background)_70%,transparent))]" />
       </div>
 
       <ScrollProgress />
