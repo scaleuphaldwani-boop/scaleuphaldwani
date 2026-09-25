@@ -376,3 +376,100 @@
 @utility animate-rec {
   animation: rec 1.2s steps(2, jump-none) infinite;
 }
+
+/* ---------- Dimensional motion system ---------- */
+.intro-stage {
+  perspective: 1200px;
+  isolation: isolate;
+}
+
+.intro-grid {
+  background-image:
+    linear-gradient(to right, color-mix(in oklab, var(--primary) 18%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklab, var(--primary) 18%, transparent) 1px, transparent 1px);
+  background-size: 7vmin 7vmin;
+  transform: perspective(500px) rotateX(62deg) scale(2.2) translateY(24%);
+  mask-image: radial-gradient(circle at center, black, transparent 68%);
+}
+
+.intro-ring {
+  box-shadow: inset 0 0 24px color-mix(in oklab, var(--primary) 25%, transparent),
+    0 0 18px color-mix(in oklab, var(--primary) 36%, transparent);
+}
+
+.intro-title {
+  text-shadow: 0 0 42px color-mix(in oklab, var(--primary) 25%, transparent);
+}
+
+.intro-title-shadow {
+  z-index: -1;
+  opacity: 0.28;
+  transform: translate3d(16px, 18px, -40px);
+  filter: blur(1px);
+}
+
+.intro-scan {
+  background: linear-gradient(to bottom, transparent, color-mix(in oklab, var(--primary) 20%, transparent), transparent);
+  mix-blend-mode: screen;
+}
+
+.depth-stage {
+  perspective: 1200px;
+  transform-style: preserve-3d;
+}
+
+.depth-grid {
+  background-image:
+    linear-gradient(to right, color-mix(in oklab, var(--primary) 9%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklab, var(--foreground) 6%, transparent) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: linear-gradient(to bottom, black, transparent 86%);
+  transform: perspective(700px) rotateX(58deg) scale(1.5) translateY(12%);
+  transform-origin: bottom center;
+}
+
+.depth-card {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  contain: layout paint;
+}
+
+.depth-card::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  z-index: 3;
+  pointer-events: none;
+  border: 1px solid transparent;
+  background: linear-gradient(115deg, transparent 15%, color-mix(in oklab, var(--primary) 82%, transparent) 48%, transparent 68%) border-box;
+  mask: linear-gradient(black 0 0) padding-box, linear-gradient(black 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  transform: translateX(-35%);
+  transition: opacity 300ms ease, transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.depth-card:hover::before {
+  opacity: 1;
+  transform: translateX(35%);
+}
+
+.depth-card::after {
+  content: "";
+  position: absolute;
+  inset: 18% 10% -12%;
+  z-index: -1;
+  background: color-mix(in oklab, var(--primary) 28%, transparent);
+  filter: blur(28px);
+  opacity: 0;
+  transform: translateZ(-60px) translateY(24px);
+  transition: opacity 350ms ease;
+}
+
+.depth-card:hover::after { opacity: 0.72; }
+
+@media (max-width: 767px) {
+  .intro-title-shadow { transform: translate3d(7px, 9px, -20px); }
+  .depth-card::after { display: none; }
+  .depth-card::before { opacity: 0.35; transform: none; }
+}
