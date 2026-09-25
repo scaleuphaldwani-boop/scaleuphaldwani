@@ -50,9 +50,9 @@ const Tile = memo(function Tile({
       onClick={() => onOpen(project)}
       onPointerEnter={() => setHover(true)}
       onPointerLeave={() => setHover(false)}
-      initial={{ clipPath: "inset(100% 0 0 0 round 1.5rem)", opacity: 0 }}
-      whileInView={{ clipPath: "inset(0% 0 0 0 round 1.5rem)", opacity: 1 }}
-      viewport={{ once: true, amount: 0.2 }}
+      initial={{ opacity: 0, y: 60, scale: 0.92 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, amount: 0.1 }}
       transition={{ duration: 0.9, ease: EASE, delay: (index % 4) * 0.08 }}
       className={`group relative block w-full overflow-hidden rounded-3xl border border-border bg-card text-left ${
         featured ? "col-span-2 row-span-2" : "aspect-[9/16]"
