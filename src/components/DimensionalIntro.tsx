@@ -1,4 +1,4 @@
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 
@@ -25,14 +25,14 @@ export function DimensionalIntro() {
   }, [visible]);
 
   return (
-    <AnimatePresence>
+    <>
       {visible && (
         <motion.div
           key="dimensional-intro"
           role="presentation"
           initial={{ opacity: 1 }}
-          exit={{ opacity: 0, scale: 1.12, filter: "blur(12px)" }}
-          transition={{ duration: 0.7, ease: [0.76, 0, 0.24, 1] }}
+          animate={{ opacity: [1, 1, 0], scale: [1, 1, 1.08] }}
+          transition={{ duration: 3.6, times: [0, 0.82, 1], ease: [0.76, 0, 0.24, 1] }}
           className="intro-stage fixed inset-0 z-[100] overflow-hidden bg-background"
         >
           <Button
@@ -103,6 +103,6 @@ export function DimensionalIntro() {
           />
         </motion.div>
       )}
-    </AnimatePresence>
+    </>
   );
 }
