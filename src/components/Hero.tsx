@@ -43,7 +43,7 @@ export function Hero() {
         }
       }}
       onPointerLeave={() => { pointerX.set(0); pointerY.set(0); }}
-      className="depth-stage relative min-h-[92svh] overflow-hidden pt-32 sm:pt-44"
+      className="depth-stage relative min-h-[min(92svh,900px)] overflow-hidden pt-32 sm:pt-44"
     >
       <div aria-hidden className="depth-grid pointer-events-none absolute inset-0" />
       <motion.div
@@ -70,7 +70,7 @@ export function Hero() {
           style={reduced ? {} : { rotateX, rotateY, z: titleZ, y: titleY, opacity: titleOpacity }}
           className="relative text-[18vw] leading-[0.85] [transform-style:preserve-3d] sm:text-[9rem] lg:text-[11rem]"
         >
-          <span aria-hidden className="absolute inset-0 translate-x-2 translate-y-2 text-primary/20 [transform:translateZ(-70px)]">VISUAL<br />ARCHITECT.</span>
+          <span aria-hidden className="hero-title-shadow absolute inset-0 text-primary">VISUAL<br />ARCHITECT.</span>
           <span className="block">{letters("VISUAL", 0.1)}</span>
           <span className="block">{letters("ARCHITECT.", 0.4, "text-red-fade")}</span>
         </motion.h1>

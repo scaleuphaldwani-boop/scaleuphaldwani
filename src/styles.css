@@ -418,6 +418,12 @@
   transform-style: preserve-3d;
 }
 
+.hero-title-shadow {
+  pointer-events: none;
+  opacity: 0.18;
+  transform: translate3d(10px, 12px, -70px);
+}
+
 .depth-grid {
   background-image:
     linear-gradient(to right, color-mix(in oklab, var(--primary) 9%, transparent) 1px, transparent 1px),
