@@ -1,15 +1,19 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { Button } from "./ui/button";
 
 const shutters = Array.from({ length: 8 });
 const rings = Array.from({ length: 7 });
 
 export function DimensionalIntro() {
   const reduceMotion = useReducedMotion();
-  const [visible, setVisible] = useState(!reduceMotion);
+  const [visible, setVisible] = useState(true);
 
   useEffect(() => {
-    if (reduceMotion) return;
+    if (reduceMotion) {
+      setVisible(false);
+      return;
+    }
     const timer = window.setTimeout(() => setVisible(false), 3600);
     return () => window.clearTimeout(timer);
   }, [reduceMotion]);
@@ -32,13 +36,14 @@ export function DimensionalIntro() {
           transition={{ duration: 0.7, ease: [0.76, 0, 0.24, 1] }}
           className="intro-stage fixed inset-0 z-[100] overflow-hidden bg-background"
         >
-          <button
+          <Button
             type="button"
             onClick={() => setVisible(false)}
-            className="absolute right-5 top-5 z-50 border border-border bg-background/70 px-4 py-2 text-[10px] uppercase tracking-[0.24em] text-muted-foreground"
+            variant="outline"
+            className="absolute right-5 top-5 z-50 h-9 rounded-sm border-border bg-background/70 px-4 text-[10px] uppercase tracking-[0.24em] text-muted-foreground"
           >
             Skip intro
-          </button>
+          </Button>
 
           <div className="intro-grid absolute inset-0" />
           <motion.div
@@ -91,13 +96,13 @@ export function DimensionalIntro() {
             </motion.div>
           </div>
 
-          <div className="absolute inset-0 flex">
+          <div className="pointer-events-none absolute inset-0 flex">
             {shutters.map((_, i) => (
               <motion.div
                 key={i}
                 initial={{ scaleY: 1 }}
-                animate={{ scaleY: [1, 1, 0] }}
-                transition={{ duration: 1, delay: 2.75 + i * 0.035, ease: [0.76, 0, 0.24, 1] }}
+                animate={{ scaleY: 0 }}
+                transition={{ duration: 0.9, delay: 0.1 + i * 0.045, ease: [0.76, 0, 0.24, 1] }}
                 className="h-full flex-1 origin-top border-r border-border bg-background"
               />
             ))}
