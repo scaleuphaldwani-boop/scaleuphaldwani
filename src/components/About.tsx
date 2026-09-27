@@ -42,9 +42,9 @@ export function About() {
             <motion.li
               key={t.name}
               variants={revealCard}
-              whileHover={{ y: -4, scale: 1.01 }}
+               whileHover={{ y: -14, rotateY: 7, rotateX: -6, scale: 1.025 }}
               transition={{ type: "spring", stiffness: 400, damping: 24 }}
-              className="rounded-3xl border border-border bg-card p-6 transition-colors duration-300 first:bg-primary first:text-primary-foreground hover:border-primary/50"
+               className="depth-card relative rounded-3xl border border-border bg-card p-6 transition-colors duration-300 first:bg-primary first:text-primary-foreground hover:border-primary/50"
             >
               <div className="font-display text-2xl font-bold">{t.name}</div>
               <div className="mt-1 text-sm text-muted-foreground">{t.note}</div>

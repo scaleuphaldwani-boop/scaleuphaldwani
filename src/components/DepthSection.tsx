@@ -1,8 +1,9 @@
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { type ReactNode, useRef } from "react";
 
 export function DepthSection({ children, index }: { children: ReactNode; index: number }) {
   const ref = useRef<HTMLDivElement>(null);
+  const reduced = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const rotateX = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [index % 2 ? -7 : 7, 0, 0, index % 2 ? 5 : -5]);
   const scale = useTransform(scrollYProgress, [0, 0.18, 0.82, 1], [0.94, 1, 1, 0.97]);
@@ -10,7 +11,7 @@ export function DepthSection({ children, index }: { children: ReactNode; index: 
 
   return (
     <div ref={ref} className="relative [perspective:1400px]">
-      <motion.div style={{ rotateX, scale, y, transformOrigin: "50% 50%" }} className="[transform-style:preserve-3d]">
+      <motion.div style={reduced ? {} : { rotateX, scale, y, transformOrigin: "50% 50%" }} className="[transform-style:preserve-3d]">
         {children}
       </motion.div>
       <motion.div

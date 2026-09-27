@@ -61,7 +61,7 @@ export function Process() {
           {steps.map((s, i) => {
             const active = open === i;
             return (
-              <motion.li key={s.n} variants={revealCard} className="relative">
+              <motion.li key={s.n} variants={revealCard} className="relative [perspective:900px]">
                 <span
                   className={`absolute -left-[31px] top-6 size-3 rounded-full border-2 transition-all duration-200 sm:-left-[47px] ${
                     active
@@ -72,7 +72,7 @@ export function Process() {
                 <motion.button
                   type="button"
                   onClick={() => setOpen(i)}
-                  whileHover={{ y: -4, scale: 1.005 }}
+                   whileHover={{ y: -8, rotateY: active ? -2 : 3, rotateX: -3, scale: 1.012 }}
                   whileTap={{ scale: 0.95 }}
                   transition={{ type: "spring", stiffness: 400, damping: 24 }}
                   className={`w-full rounded-2xl border p-6 text-left transition-shadow duration-200 hover:shadow-lg ${

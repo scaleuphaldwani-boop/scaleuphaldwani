@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useMotionValue, useReducedMotion, useSpring } from "framer-motion";
 import { Suspense, lazy, memo, useEffect, useRef, useState } from "react";
 import { Play } from "lucide-react";
 import { projects, type Project } from "@/data/projects";
@@ -23,6 +23,11 @@ const Tile = memo(function Tile({
   const isMobile = useIsMobile();
   const [hover, setHover] = useState(false);
   const [inView, setInView] = useState(false);
+  const reduced = useReducedMotion();
+  const tiltX = useMotionValue(0);
+  const tiltY = useMotionValue(0);
+  const rotateX = useSpring(tiltX, { stiffness: 220, damping: 24 });
+  const rotateY = useSpring(tiltY, { stiffness: 220, damping: 24 });
 
   useEffect(() => {
     const el = ref.current;
@@ -49,12 +54,19 @@ const Tile = memo(function Tile({
       type="button"
       onClick={() => onOpen(project)}
       onPointerEnter={() => setHover(true)}
-      onPointerLeave={() => setHover(false)}
-      initial={{ opacity: 0, y: 60, scale: 0.92 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      onPointerMove={(event) => {
+        if (event.pointerType !== "mouse" || reduced) return;
+        const rect = event.currentTarget.getBoundingClientRect();
+        tiltX.set(-((event.clientY - rect.top) / rect.height - 0.5) * 12);
+        tiltY.set(((event.clientX - rect.left) / rect.width - 0.5) * 12);
+      }}
+      onPointerLeave={() => { setHover(false); tiltX.set(0); tiltY.set(0); }}
+      style={reduced ? {} : { rotateX, rotateY }}
+      initial={reduced ? false : { opacity: 0, y: 95, scale: 0.78, rotateZ: index % 2 ? 8 : -8 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1, rotateZ: 0 }}
       viewport={{ once: true, amount: 0.1 }}
-      transition={{ duration: 0.9, ease: EASE, delay: (index % 4) * 0.08 }}
-      className={`group relative block w-full overflow-hidden rounded-3xl border border-border bg-card text-left ${
+      transition={{ duration: 1, ease: EASE, delay: (index % 4) * 0.1 }}
+      className={`depth-card group relative block w-full overflow-hidden rounded-3xl border border-border bg-card text-left ${
         featured ? "col-span-2 row-span-2" : "aspect-[9/16]"
       }`}
     >
@@ -62,7 +74,7 @@ const Tile = memo(function Tile({
         src={project.poster}
         alt={project.title}
         loading="lazy"
-        className="absolute inset-0 size-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+        className="absolute inset-0 size-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
       />
       {(playing || featured) && (
         <video
@@ -73,7 +85,7 @@ const Tile = memo(function Tile({
           loop
           playsInline
           preload="metadata"
-          className={`absolute inset-0 size-full object-cover transition-opacity duration-500 ${
+          className={`absolute inset-0 size-full object-cover transition-opacity duration-500 group-hover:scale-105 ${
             playing ? "opacity-100" : "opacity-0"
           }`}
         />
@@ -81,7 +93,7 @@ const Tile = memo(function Tile({
       <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/10 to-transparent" />
       <div className="absolute inset-0 bg-ink/25 transition-colors duration-500 group-hover:bg-transparent" />
 
-      <div className="absolute left-4 top-4 flex items-center gap-2 font-display text-[10px] uppercase tracking-[0.25em] text-bone/80">
+      <div className="absolute left-4 top-4 flex items-center gap-2 font-display text-[10px] uppercase tracking-[0.25em] text-bone/80 [transform:translateZ(35px)]">
         <span className={`size-1.5 rounded-full bg-primary ${playing ? "animate-rec" : ""}`} />
         {String(index + 1).padStart(2, "0")}
       </div>
@@ -90,7 +102,7 @@ const Tile = memo(function Tile({
         <Play className="size-4 fill-current" />
       </span>
 
-      <div className={`absolute inset-x-0 bottom-0 ${featured ? "p-6 sm:p-8" : "p-4"}`}>
+      <div className={`absolute inset-x-0 bottom-0 [transform:translateZ(45px)] ${featured ? "p-6 sm:p-8" : "p-4"}`}>
         {featured && (
           <span className="mb-3 inline-block rounded bg-primary px-2 py-0.5 text-[10px] uppercase tracking-widest text-primary-foreground">
             Featured
@@ -120,7 +132,7 @@ export function Projects() {
   const [first, ...rest] = projects;
 
   return (
-    <section id="work" className="scroll-mt-24 py-24">
+    <section id="work" className="relative scroll-mt-24 py-24 [perspective:1200px]">
       <div className="mx-auto max-w-7xl px-4 sm:px-8">
         <div className="mb-12 flex items-end justify-between gap-6">
           <motion.h2
@@ -137,7 +149,7 @@ export function Projects() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4 lg:grid-cols-6">
+        <div className="grid grid-cols-2 gap-3 [transform-style:preserve-3d] sm:gap-4 md:grid-cols-4 lg:grid-cols-6">
           {first && <Tile project={first} index={0} featured onOpen={setOpen} />}
           {rest.map((p, i) => (
             <Tile key={p.id} project={p} index={i + 1} onOpen={setOpen} />

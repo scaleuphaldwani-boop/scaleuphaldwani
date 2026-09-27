@@ -1,4 +1,4 @@
-import { motion, useMotionValue, useScroll, useSpring, useTransform } from "framer-motion";
+import { motion, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform } from "framer-motion";
 import { useRef } from "react";
 import { Magnetic } from "./Magnetic";
 import { EASE } from "@/lib/motion";
@@ -21,6 +21,7 @@ const ticker = ["Reels", "Brand films", "Ads", "Cinematography", "Colour grade",
 
 export function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
+  const reduced = useReducedMotion();
   const pointerX = useMotionValue(0);
   const pointerY = useMotionValue(0);
   const rotateY = useSpring(pointerX, { stiffness: 90, damping: 20 });
@@ -36,16 +37,18 @@ export function Hero() {
       id="top"
       onPointerMove={(event) => {
         const rect = event.currentTarget.getBoundingClientRect();
-        pointerX.set(((event.clientX - rect.left) / rect.width - 0.5) * 9);
-        pointerY.set(-((event.clientY - rect.top) / rect.height - 0.5) * 7);
+        if (!reduced && event.pointerType === "mouse") {
+          pointerX.set(((event.clientX - rect.left) / rect.width - 0.5) * 9);
+          pointerY.set(-((event.clientY - rect.top) / rect.height - 0.5) * 7);
+        }
       }}
       onPointerLeave={() => { pointerX.set(0); pointerY.set(0); }}
-      className="depth-stage relative min-h-[92svh] overflow-hidden pt-32 sm:pt-44"
+      className="depth-stage relative min-h-[min(88svh,860px)] overflow-hidden pt-28 sm:pt-36"
     >
       <div aria-hidden className="depth-grid pointer-events-none absolute inset-0" />
       <motion.div
         aria-hidden
-        animate={{ rotate: 360 }}
+        animate={reduced ? {} : { rotate: 360 }}
         transition={{ duration: 28, repeat: Infinity, ease: "linear" }}
         className="absolute left-[8%] top-[20%] size-52 rounded-full border border-primary/20 sm:size-80"
       >
@@ -64,15 +67,15 @@ export function Hero() {
         </motion.div>
 
         <motion.h1
-          style={{ rotateX, rotateY, z: titleZ, y: titleY, opacity: titleOpacity }}
+          style={reduced ? {} : { rotateX, rotateY, z: titleZ, y: titleY, opacity: titleOpacity }}
           className="relative text-[18vw] leading-[0.85] [transform-style:preserve-3d] sm:text-[9rem] lg:text-[11rem]"
         >
-          <span aria-hidden className="absolute inset-0 translate-x-2 translate-y-2 text-primary/20 [transform:translateZ(-70px)]">VISUAL<br />ARCHITECT.</span>
+          <span aria-hidden className="hero-title-shadow absolute inset-0 text-primary">VISUAL<br />ARCHITECT.</span>
           <span className="block">{letters("VISUAL", 0.1)}</span>
           <span className="block">{letters("ARCHITECT.", 0.4, "text-red-fade")}</span>
         </motion.h1>
 
-        <div className="mt-10 flex flex-col items-start justify-between gap-8 md:flex-row md:items-end">
+        <div className="mt-8 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -123,7 +126,7 @@ export function Hero() {
         </div>
       </div>
 
-      <div className="mt-20 overflow-hidden border-y border-border py-5">
+      <div className="mt-6 overflow-hidden border-y border-border py-5 sm:mt-10">
         <div className="animate-marquee flex w-max gap-10 whitespace-nowrap font-display text-2xl font-bold uppercase sm:text-4xl">
           {[...ticker, ...ticker].map((t, i) => (
             <span key={i} className="flex items-center gap-10">

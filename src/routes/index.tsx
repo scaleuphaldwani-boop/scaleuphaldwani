@@ -9,6 +9,9 @@ import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
 import { ScrollProgress } from "@/components/ScrollProgress";
 import { ChatLauncher } from "@/components/ChatLauncher";
+import { DimensionalIntro } from "@/components/DimensionalIntro";
+import { DepthCursor } from "@/components/DepthCursor";
+import { DepthSection } from "@/components/DepthSection";
 
 const title = "Scaleup Haldwani | Video Editor & Cinematographer";
 const description =
@@ -31,20 +34,21 @@ export const Route = createFileRoute("/")({
 function Index() {
   return (
     <div className="relative min-h-screen overflow-x-clip bg-background text-foreground">
-      {/* Global premium background: drifting ice aurora + blueprint grid + film grain */}
       <div aria-hidden className="pointer-events-none fixed inset-0 z-0">
         <div className="absolute -top-40 left-1/2 h-[600px] w-[900px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--primary)_18%,transparent),transparent)]" />
         <div className="bg-grain absolute inset-0 hidden md:block" />
       </div>
 
+      <DimensionalIntro />
+      <DepthCursor />
       <ScrollProgress />
       <Nav />
       <main className="relative z-10">
         <Hero />
         <Projects />
-        <Pricing />
-        <Process />
-        <About />
+        <DepthSection index={0}><Pricing /></DepthSection>
+        <DepthSection index={1}><Process /></DepthSection>
+        <DepthSection index={2}><About /></DepthSection>
         <Contact />
       </main>
       <div className="relative z-10">
