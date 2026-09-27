@@ -48,7 +48,7 @@ export function Hero() {
       <div aria-hidden className="depth-grid pointer-events-none absolute inset-0" />
       <motion.div
         aria-hidden
-        animate={reduced ? undefined : { rotate: 360 }}
+        animate={reduced ? {} : { rotate: 360 }}
         transition={{ duration: 28, repeat: Infinity, ease: "linear" }}
         className="absolute left-[8%] top-[20%] size-52 rounded-full border border-primary/20 sm:size-80"
       >
@@ -67,7 +67,7 @@ export function Hero() {
         </motion.div>
 
         <motion.h1
-          style={reduced ? undefined : { rotateX, rotateY, z: titleZ, y: titleY, opacity: titleOpacity }}
+          style={reduced ? {} : { rotateX, rotateY, z: titleZ, y: titleY, opacity: titleOpacity }}
           className="relative text-[18vw] leading-[0.85] [transform-style:preserve-3d] sm:text-[9rem] lg:text-[11rem]"
         >
           <span aria-hidden className="absolute inset-0 translate-x-2 translate-y-2 text-primary/20 [transform:translateZ(-70px)]">VISUAL<br />ARCHITECT.</span>

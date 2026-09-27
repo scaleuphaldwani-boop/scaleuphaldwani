@@ -66,9 +66,9 @@ export function DimensionalIntro() {
 
           <div className="absolute inset-0 flex items-center justify-center [perspective:900px]">
             <motion.div
-              initial={{ scale: 7, rotateX: 68, z: -800, opacity: 0 }}
-              animate={{ scale: [7, 1, 1, 12], rotateX: [68, 0, 0, -20], z: [-800, 0, 0, 900], opacity: [0, 1, 1, 0] }}
-              transition={{ duration: 3.35, times: [0, 0.38, 0.78, 1], ease: [0.76, 0, 0.24, 1] }}
+              initial={{ scale: 1.8, rotateX: 68, z: -800, opacity: 0 }}
+              animate={{ scale: [1.8, 1, 1, 8], rotateX: [68, 0, 0, -20], z: [-800, 0, 0, 900], opacity: [0, 1, 1, 0] }}
+              transition={{ duration: 3.15, times: [0, 0.3, 0.8, 1], ease: [0.76, 0, 0.24, 1] }}
               className="relative text-center [transform-style:preserve-3d]"
             >
               <motion.p

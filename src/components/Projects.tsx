@@ -61,7 +61,7 @@ const Tile = memo(function Tile({
         tiltY.set(((event.clientX - rect.left) / rect.width - 0.5) * 12);
       }}
       onPointerLeave={() => { setHover(false); tiltX.set(0); tiltY.set(0); }}
-      style={reduced ? undefined : { rotateX, rotateY }}
+      style={reduced ? {} : { rotateX, rotateY }}
       initial={reduced ? false : { opacity: 0, y: 95, scale: 0.78, rotateZ: index % 2 ? 8 : -8 }}
       whileInView={{ opacity: 1, y: 0, scale: 1, rotateZ: 0 }}
       viewport={{ once: true, amount: 0.1 }}

@@ -11,7 +11,7 @@ export function DepthSection({ children, index }: { children: ReactNode; index: 
 
   return (
     <div ref={ref} className="relative [perspective:1400px]">
-      <motion.div style={reduced ? undefined : { rotateX, scale, y, transformOrigin: "50% 50%" }} className="[transform-style:preserve-3d]">
+      <motion.div style={reduced ? {} : { rotateX, scale, y, transformOrigin: "50% 50%" }} className="[transform-style:preserve-3d]">
         {children}
       </motion.div>
       <motion.div
