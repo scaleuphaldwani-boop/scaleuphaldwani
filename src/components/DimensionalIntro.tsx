@@ -2,7 +2,6 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 
-const shutters = Array.from({ length: 8 });
 const rings = Array.from({ length: 7 });
 
 export function DimensionalIntro() {
@@ -96,17 +95,6 @@ export function DimensionalIntro() {
             </motion.div>
           </div>
 
-          <div className="pointer-events-none absolute inset-0 flex">
-            {shutters.map((_, i) => (
-              <motion.div
-                key={i}
-                initial={{ scaleY: 1 }}
-                animate={{ scaleY: 0 }}
-                transition={{ duration: 0.9, delay: 0.1 + i * 0.045, ease: [0.76, 0, 0.24, 1] }}
-                className="h-full flex-1 origin-top border-r border-border bg-background"
-              />
-            ))}
-          </div>
           <motion.div
             initial={{ y: "-100%" }}
             animate={{ y: "120%" }}
