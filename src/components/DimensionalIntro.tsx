@@ -6,13 +6,11 @@ const rings = Array.from({ length: 7 });
 
 export function DimensionalIntro() {
   const reduceMotion = useReducedMotion();
-  const [visible, setVisible] = useState(true);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    if (reduceMotion) {
-      setVisible(false);
-      return;
-    }
+    if (reduceMotion || window.location.hash) return;
+    setVisible(true);
     const timer = window.setTimeout(() => setVisible(false), 3600);
     return () => window.clearTimeout(timer);
   }, [reduceMotion]);
