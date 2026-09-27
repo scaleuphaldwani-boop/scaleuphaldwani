@@ -43,7 +43,7 @@ export function Hero() {
         }
       }}
       onPointerLeave={() => { pointerX.set(0); pointerY.set(0); }}
-      className="depth-stage relative min-h-[min(92svh,900px)] overflow-hidden pt-32 sm:pt-44"
+      className="depth-stage relative min-h-[min(88svh,860px)] overflow-hidden pt-28 sm:pt-36"
     >
       <div aria-hidden className="depth-grid pointer-events-none absolute inset-0" />
       <motion.div
@@ -75,7 +75,7 @@ export function Hero() {
           <span className="block">{letters("ARCHITECT.", 0.4, "text-red-fade")}</span>
         </motion.h1>
 
-        <div className="mt-10 flex flex-col items-start justify-between gap-8 md:flex-row md:items-end">
+        <div className="mt-8 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -126,7 +126,7 @@ export function Hero() {
         </div>
       </div>
 
-      <div className="mt-20 overflow-hidden border-y border-border py-5">
+      <div className="mt-6 overflow-hidden border-y border-border py-5 sm:mt-10">
         <div className="animate-marquee flex w-max gap-10 whitespace-nowrap font-display text-2xl font-bold uppercase sm:text-4xl">
           {[...ticker, ...ticker].map((t, i) => (
             <span key={i} className="flex items-center gap-10">
