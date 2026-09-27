@@ -62,9 +62,9 @@ export function Pricing() {
               <motion.div
                 key={plan.name}
                 variants={revealCard}
-                whileHover={{ y: -8, rotate: f ? 0 : -0.6 }}
+                whileHover={{ y: -18, rotateY: f ? -5 : 5, rotateX: 5, scale: 1.025 }}
                 transition={{ type: "spring", stiffness: 380, damping: 22 }}
-                className={`relative flex flex-col justify-between rounded-[2rem] p-8 ${
+                className={`depth-card relative flex flex-col justify-between rounded-[2rem] p-8 ${
                   f ? "bg-bone text-ink shadow-glow" : "border border-border bg-card transition-colors hover:border-primary/40"
                 }`}
               >
