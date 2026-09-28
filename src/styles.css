@@ -476,6 +476,7 @@
 
 @media (max-width: 767px) {
   .intro-title-shadow { transform: translate3d(7px, 9px, -20px); }
+  .hero-title-shadow { opacity: 0.08; transform: translate3d(3px, 5px, -20px); }
   .depth-card::after { display: none; }
   .depth-card::before { opacity: 0.35; transform: none; }
 }
