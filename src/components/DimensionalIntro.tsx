@@ -6,11 +6,13 @@ const rings = Array.from({ length: 7 });
 
 export function DimensionalIntro() {
   const reduceMotion = useReducedMotion();
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(true);
 
   useEffect(() => {
-    if (reduceMotion || window.location.hash) return;
-    setVisible(true);
+    if (reduceMotion || window.location.hash) {
+      setVisible(false);
+      return;
+    }
     const timer = window.setTimeout(() => setVisible(false), 3600);
     return () => window.clearTimeout(timer);
   }, [reduceMotion]);
@@ -30,7 +32,7 @@ export function DimensionalIntro() {
           role="presentation"
           initial={{ opacity: 1 }}
           animate={{ opacity: [1, 1, 0], scale: [1, 1, 1.08] }}
-          transition={{ duration: 3.6, times: [0, 0.82, 1], ease: [0.76, 0, 0.24, 1] }}
+          transition={{ duration: 3.5, times: [0, 0.82, 1], ease: [0.76, 0, 0.24, 1] }}
           className="intro-stage fixed inset-0 z-[100] overflow-hidden bg-background"
         >
           <Button
