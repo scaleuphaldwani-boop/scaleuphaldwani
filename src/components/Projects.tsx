@@ -3,7 +3,6 @@ import { Suspense, lazy, memo, useEffect, useRef, useState } from "react";
 import { Play } from "lucide-react";
 import { projects, type Project } from "@/data/projects";
 import { EASE } from "@/lib/motion";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 const ProjectLightbox = lazy(() => import("./ProjectLightbox"));
 
@@ -12,48 +11,38 @@ const Tile = memo(function Tile({
   index,
   featured,
   onOpen,
+  activeMobile,
 }: {
   project: Project;
   index: number;
   featured?: boolean;
   onOpen: (p: Project) => void;
+  activeMobile: boolean;
 }) {
-  const ref = useRef<HTMLButtonElement>(null);
   const vid = useRef<HTMLVideoElement>(null);
-  const isMobile = useIsMobile();
   const [hover, setHover] = useState(false);
-  const [inView, setInView] = useState(false);
+  const [ready, setReady] = useState(false);
   const reduced = useReducedMotion();
   const tiltX = useMotionValue(0);
   const tiltY = useMotionValue(0);
   const rotateX = useSpring(tiltX, { stiffness: 220, damping: 24 });
   const rotateY = useSpring(tiltY, { stiffness: 220, damping: 24 });
 
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const io = new IntersectionObserver(([e]) => setInView(!!e?.isIntersecting), {
-      threshold: 0.6,
-    });
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
-
-  const playing = isMobile ? inView : hover || (featured && inView);
+  const playing = activeMobile || hover;
 
   useEffect(() => {
     const v = vid.current;
     if (!v) return;
-    if (playing) v.play().catch(() => {});
+    if (playing) void v.play().catch(() => {});
     else v.pause();
   }, [playing]);
 
   return (
     <motion.button
-      ref={ref}
       type="button"
+      data-project-tile={project.id}
       onClick={() => onOpen(project)}
-      onPointerEnter={() => setHover(true)}
+      onPointerEnter={(event) => { if (event.pointerType === "mouse") setHover(true); }}
       onPointerMove={(event) => {
         if (event.pointerType !== "mouse" || reduced) return;
         const rect = event.currentTarget.getBoundingClientRect();
@@ -74,20 +63,19 @@ const Tile = memo(function Tile({
         src={project.poster}
         alt={project.title}
         loading="lazy"
+        decoding="async"
         className="absolute inset-0 size-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
       />
-      {(playing || featured) && (
+      {playing && (
         <video
           ref={vid}
           src={project.video}
-          poster={project.poster}
           muted
           loop
           playsInline
-          preload="metadata"
-          className={`absolute inset-0 size-full object-cover transition-opacity duration-500 group-hover:scale-105 ${
-            playing ? "opacity-100" : "opacity-0"
-          }`}
+          preload="none"
+          onLoadedData={() => setReady(true)}
+          className={`absolute inset-0 size-full object-cover transition-opacity duration-300 ${ready ? "opacity-100" : "opacity-0"}`}
         />
       )}
       <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/10 to-transparent" />
@@ -129,10 +117,56 @@ const Tile = memo(function Tile({
 
 export function Projects() {
   const [open, setOpen] = useState<Project | null>(null);
+  const [activeMobile, setActiveMobile] = useState<string | null>(null);
+  const sectionRef = useRef<HTMLElement>(null);
   const [first, ...rest] = projects;
 
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+    const media = window.matchMedia("(max-width: 767px)");
+    let frame = 0;
+    let observing = false;
+    const update = () => {
+      frame = 0;
+      if (!media.matches || !observing || document.hidden || open) {
+        setActiveMobile(null);
+        return;
+      }
+      const center = window.innerHeight * 0.48;
+      let closest: string | null = null;
+      let distance = Infinity;
+      section.querySelectorAll<HTMLElement>("[data-project-tile]").forEach((tile) => {
+        const rect = tile.getBoundingClientRect();
+        if (rect.bottom < window.innerHeight * 0.18 || rect.top > window.innerHeight * 0.82) return;
+        const next = Math.abs((rect.top + rect.bottom) / 2 - center);
+        if (next < distance) { distance = next; closest = tile.dataset.projectTile ?? null; }
+      });
+      setActiveMobile((current) => current === closest ? current : closest);
+    };
+    const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
+    const observer = new IntersectionObserver(([entry]) => {
+      observing = Boolean(entry?.isIntersecting);
+      schedule();
+    }, { rootMargin: "400px 0px" });
+    observer.observe(section);
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule, { passive: true });
+    document.addEventListener("visibilitychange", schedule);
+    media.addEventListener("change", schedule);
+    schedule();
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+      document.removeEventListener("visibilitychange", schedule);
+      media.removeEventListener("change", schedule);
+      cancelAnimationFrame(frame);
+    };
+  }, [open]);
+
   return (
-    <section id="work" className="relative scroll-mt-24 py-24 [perspective:1200px]">
+    <section ref={sectionRef} id="work" className="relative scroll-mt-24 py-24 [perspective:1200px]">
       <div className="mx-auto max-w-7xl px-4 sm:px-8">
         <div className="mb-12 flex items-end justify-between gap-6">
           <motion.h2
@@ -150,9 +184,9 @@ export function Projects() {
         </div>
 
         <div className="grid grid-cols-2 gap-3 [transform-style:preserve-3d] sm:gap-4 md:grid-cols-4 lg:grid-cols-6">
-          {first && <Tile project={first} index={0} featured onOpen={setOpen} />}
+          {first && <Tile project={first} index={0} featured onOpen={setOpen} activeMobile={activeMobile === first.id} />}
           {rest.map((p, i) => (
-            <Tile key={p.id} project={p} index={i + 1} onOpen={setOpen} />
+            <Tile key={p.id} project={p} index={i + 1} onOpen={setOpen} activeMobile={activeMobile === p.id} />
           ))}
           <motion.a
             href="#contact"
