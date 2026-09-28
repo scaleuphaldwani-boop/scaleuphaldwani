@@ -37,6 +37,10 @@ const Tile = memo(function Tile({
     else v.pause();
   }, [playing]);
 
+  useEffect(() => {
+    if (!playing) setReady(false);
+  }, [playing]);
+
   return (
     <motion.button
       type="button"
