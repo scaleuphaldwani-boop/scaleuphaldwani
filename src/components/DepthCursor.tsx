@@ -1,4 +1,4 @@
-import { motion, useMotionValue, useSpring } from "framer-motion";
+import { motion, useMotionValue, useReducedMotion, useSpring } from "framer-motion";
 import { useEffect, useState } from "react";
 
 export function DepthCursor() {
@@ -8,21 +8,31 @@ export function DepthCursor() {
   const springY = useSpring(y, { stiffness: 700, damping: 45, mass: 0.15 });
   const [active, setActive] = useState(false);
   const [enabled, setEnabled] = useState(false);
+  const reduced = useReducedMotion();
 
   useEffect(() => {
-    const media = window.matchMedia("(pointer: fine) and (min-width: 768px)");
-    setEnabled(media.matches);
+    const media = window.matchMedia("(pointer: fine) and (min-width: 768px) and (prefers-reduced-motion: no-preference)");
     const move = (event: PointerEvent) => {
       x.set(event.clientX);
       y.set(event.clientY);
       const target = event.target;
-      setActive(target instanceof Element && Boolean(target.closest("a,button,input,textarea,select")));
+      const next = target instanceof Element && Boolean(target.closest("a,button,input,textarea,select"));
+      setActive((current) => current === next ? current : next);
     };
-    window.addEventListener("pointermove", move, { passive: true });
-    return () => window.removeEventListener("pointermove", move);
+    const sync = () => {
+      setEnabled(media.matches);
+      if (media.matches) window.addEventListener("pointermove", move, { passive: true });
+      else window.removeEventListener("pointermove", move);
+    };
+    media.addEventListener("change", sync);
+    sync();
+    return () => {
+      media.removeEventListener("change", sync);
+      window.removeEventListener("pointermove", move);
+    };
   }, [x, y]);
 
-  if (!enabled) return null;
+  if (!enabled || reduced) return null;
   return (
     <motion.div
       aria-hidden

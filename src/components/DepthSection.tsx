@@ -1,22 +1,18 @@
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
-import { type ReactNode, useRef } from "react";
+import { motion, useReducedMotion } from "framer-motion";
+import { type ReactNode } from "react";
 
-export function DepthSection({ children, index }: { children: ReactNode; index: number }) {
-  const ref = useRef<HTMLDivElement>(null);
+export function DepthSection({ children }: { children: ReactNode; index: number }) {
   const reduced = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const rotateX = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [index % 2 ? -7 : 7, 0, 0, index % 2 ? 5 : -5]);
-  const scale = useTransform(scrollYProgress, [0, 0.18, 0.82, 1], [0.94, 1, 1, 0.97]);
-  const y = useTransform(scrollYProgress, [0, 0.22, 0.8, 1], [90, 0, 0, -40]);
 
   return (
-    <div ref={ref} className="relative [perspective:1400px]">
-      <motion.div style={reduced ? {} : { rotateX, scale, y, transformOrigin: "50% 50%" }} className="[transform-style:preserve-3d]">
-        {children}
-      </motion.div>
+    <div className="relative">
+      {children}
       <motion.div
         aria-hidden
-        style={{ scaleX: useTransform(scrollYProgress, [0.05, 0.45], [0, 1]) }}
+        initial={reduced ? false : { scaleX: 0 }}
+        whileInView={{ scaleX: 1 }}
+        viewport={{ once: true, amount: 0.1 }}
+        transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
         className="pointer-events-none absolute inset-x-[8%] top-0 h-px origin-center bg-primary shadow-glow"
       />
     </div>
