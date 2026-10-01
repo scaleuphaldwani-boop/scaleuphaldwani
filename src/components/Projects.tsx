@@ -12,12 +12,14 @@ const Tile = memo(function Tile({
   featured,
   onOpen,
   activeMobile,
+  paused,
 }: {
   project: Project;
   index: number;
   featured?: boolean;
   onOpen: (p: Project) => void;
   activeMobile: boolean;
+  paused: boolean;
 }) {
   const vid = useRef<HTMLVideoElement>(null);
   const [hover, setHover] = useState(false);
@@ -28,7 +30,7 @@ const Tile = memo(function Tile({
   const rotateX = useSpring(tiltX, { stiffness: 220, damping: 24 });
   const rotateY = useSpring(tiltY, { stiffness: 220, damping: 24 });
 
-  const playing = activeMobile || hover;
+  const playing = !paused && (activeMobile || hover);
 
   useEffect(() => {
     const v = vid.current;
@@ -60,7 +62,7 @@ const Tile = memo(function Tile({
       viewport={{ once: true, amount: 0.1 }}
       transition={{ duration: 1, ease: EASE, delay: (index % 4) * 0.1 }}
       className={`depth-card group relative block w-full overflow-hidden rounded-3xl border border-border bg-card text-left ${
-        featured ? "col-span-2 row-span-2" : "aspect-[9/16]"
+        featured ? "col-span-2 row-span-2 aspect-[9/16]" : "aspect-[9/16]"
       }`}
     >
       <img
@@ -133,8 +135,15 @@ export function Projects() {
     let observing = false;
     const update = () => {
       frame = 0;
-      if (!media.matches || !observing || document.hidden || open) {
+      if (!observing || document.hidden || open) {
         setActiveMobile(null);
+        return;
+      }
+      if (!media.matches) {
+        const featured = section.querySelector<HTMLElement>('[data-project-tile]');
+        const rect = featured?.getBoundingClientRect();
+        const visible = rect && rect.top < window.innerHeight * 0.85 && rect.bottom > window.innerHeight * 0.15;
+        setActiveMobile((current) => current === (visible ? first?.id ?? null : null) ? current : (visible ? first?.id ?? null : null));
         return;
       }
       const center = window.innerHeight * 0.48;
@@ -144,7 +153,7 @@ export function Projects() {
         const rect = tile.getBoundingClientRect();
         if (rect.bottom < window.innerHeight * 0.18 || rect.top > window.innerHeight * 0.82) return;
         const next = Math.abs((rect.top + rect.bottom) / 2 - center);
-        if (next < distance) { distance = next; closest = tile.dataset.projectTile ?? null; }
+        if (next < distance) { distance = next; closest = tile.dataset['projectTile'] ?? null; }
       });
       setActiveMobile((current) => current === closest ? current : closest);
     };
@@ -188,9 +197,9 @@ export function Projects() {
         </div>
 
         <div className="grid grid-cols-2 gap-3 [transform-style:preserve-3d] sm:gap-4 md:grid-cols-4 lg:grid-cols-6">
-          {first && <Tile project={first} index={0} featured onOpen={setOpen} activeMobile={activeMobile === first.id} />}
+          {first && <Tile project={first} index={0} featured onOpen={setOpen} activeMobile={activeMobile === first.id} paused={Boolean(open)} />}
           {rest.map((p, i) => (
-            <Tile key={p.id} project={p} index={i + 1} onOpen={setOpen} activeMobile={activeMobile === p.id} />
+            <Tile key={p.id} project={p} index={i + 1} onOpen={setOpen} activeMobile={activeMobile === p.id} paused={Boolean(open)} />
           ))}
           <motion.a
             href="#contact"
