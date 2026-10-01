@@ -144,7 +144,7 @@ export function Projects() {
         const rect = tile.getBoundingClientRect();
         if (rect.bottom < window.innerHeight * 0.18 || rect.top > window.innerHeight * 0.82) return;
         const next = Math.abs((rect.top + rect.bottom) / 2 - center);
-        if (next < distance) { distance = next; closest = tile.dataset.projectTile ?? null; }
+        if (next < distance) { distance = next; closest = tile.dataset['projectTile'] ?? null; }
       });
       setActiveMobile((current) => current === closest ? current : closest);
     };
