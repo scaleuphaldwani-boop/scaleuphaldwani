@@ -28,7 +28,7 @@ const Tile = memo(function Tile({
   const rotateX = useSpring(tiltX, { stiffness: 220, damping: 24 });
   const rotateY = useSpring(tiltY, { stiffness: 220, damping: 24 });
 
-  const playing = activeMobile || hover;
+  const playing = !open && (activeMobile || hover);
 
   useEffect(() => {
     const v = vid.current;
