@@ -135,8 +135,15 @@ export function Projects() {
     let observing = false;
     const update = () => {
       frame = 0;
-      if (!media.matches || !observing || document.hidden || open) {
+      if (!observing || document.hidden || open) {
         setActiveMobile(null);
+        return;
+      }
+      if (!media.matches) {
+        const featured = section.querySelector<HTMLElement>('[data-project-tile]');
+        const rect = featured?.getBoundingClientRect();
+        const visible = rect && rect.top < window.innerHeight * 0.85 && rect.bottom > window.innerHeight * 0.15;
+        setActiveMobile((current) => current === (visible ? first?.id ?? null : null) ? current : (visible ? first?.id ?? null : null));
         return;
       }
       const center = window.innerHeight * 0.48;
