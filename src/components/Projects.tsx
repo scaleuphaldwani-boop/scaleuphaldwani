@@ -62,7 +62,7 @@ const Tile = memo(function Tile({
       viewport={{ once: true, amount: 0.1 }}
       transition={{ duration: 1, ease: EASE, delay: (index % 4) * 0.1 }}
       className={`depth-card group relative block w-full overflow-hidden rounded-3xl border border-border bg-card text-left ${
-        featured ? "col-span-2 row-span-2" : "aspect-[9/16]"
+        featured ? "col-span-2 row-span-2 aspect-[9/16]" : "aspect-[9/16]"
       }`}
     >
       <img
