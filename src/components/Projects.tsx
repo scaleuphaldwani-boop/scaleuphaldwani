@@ -12,12 +12,14 @@ const Tile = memo(function Tile({
   featured,
   onOpen,
   activeMobile,
+  paused,
 }: {
   project: Project;
   index: number;
   featured?: boolean;
   onOpen: (p: Project) => void;
   activeMobile: boolean;
+  paused: boolean;
 }) {
   const vid = useRef<HTMLVideoElement>(null);
   const [hover, setHover] = useState(false);
@@ -28,7 +30,7 @@ const Tile = memo(function Tile({
   const rotateX = useSpring(tiltX, { stiffness: 220, damping: 24 });
   const rotateY = useSpring(tiltY, { stiffness: 220, damping: 24 });
 
-  const playing = !open && (activeMobile || hover);
+  const playing = !paused && (activeMobile || hover);
 
   useEffect(() => {
     const v = vid.current;
@@ -188,9 +190,9 @@ export function Projects() {
         </div>
 
         <div className="grid grid-cols-2 gap-3 [transform-style:preserve-3d] sm:gap-4 md:grid-cols-4 lg:grid-cols-6">
-          {first && <Tile project={first} index={0} featured onOpen={setOpen} activeMobile={activeMobile === first.id} />}
+          {first && <Tile project={first} index={0} featured onOpen={setOpen} activeMobile={activeMobile === first.id} paused={Boolean(open)} />}
           {rest.map((p, i) => (
-            <Tile key={p.id} project={p} index={i + 1} onOpen={setOpen} activeMobile={activeMobile === p.id} />
+            <Tile key={p.id} project={p} index={i + 1} onOpen={setOpen} activeMobile={activeMobile === p.id} paused={Boolean(open)} />
           ))}
           <motion.a
             href="#contact"
