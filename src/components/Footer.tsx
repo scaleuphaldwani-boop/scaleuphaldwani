@@ -20,6 +20,7 @@ export function Footer() {
             <Instagram className="size-4" />
             <span>@scaleuphaldwani</span>
           </a>
+          <a href="/dashboard" className="text-xs text-muted-foreground hover:text-foreground">Studio login</a>
         </div>
 
         <p>Video editing &amp; cinematography &middot; Haldwani, Uttarakhand</p>

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Instagram } from "lucide-react";
 import { fadeUp, stagger, viewportOnce } from "@/lib/motion";
 import { Magnetic } from "./Magnetic";
+import { supabase } from "@/integrations/supabase/client";
 
 const EMAIL = "scaleuphaldwani@gmail.com";
 const PHONES = ["9105456076", "9837787246"];
@@ -21,6 +22,12 @@ export function Contact() {
   const submit = async () => {
     setSending(true);
     setError("");
+    void supabase.from("enquiries").insert({
+      name: form.name.trim(),
+      email: form.email.trim(),
+      project_type: form.project || null,
+      message: form.message.trim(),
+    }).then(({ error: e }) => { if (e) console.error(e); });
     try {
       const res = await fetch(`https://formsubmit.co/ajax/${EMAIL}`, {
         method: "POST",
