@@ -481,3 +481,8 @@
   .depth-card::after { display: none; }
   .depth-card::before { display: none; }
 }
+
+@media (max-width: 767px) {
+  .animate-ice-pulse, .aurora-page, .bg-grain { animation: none !important; }
+  .bg-grain { display: none; }
+}

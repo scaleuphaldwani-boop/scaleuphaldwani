@@ -1,6 +1,7 @@
 import { motion, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform } from "framer-motion";
 import { useRef } from "react";
 import { Magnetic } from "./Magnetic";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { EASE } from "@/lib/motion";
 
 const letters = (word: string, delay: number, cls = "") =>
@@ -22,6 +23,7 @@ const ticker = ["Reels", "Brand films", "Ads", "Cinematography", "Colour grade",
 export function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
   const reduced = useReducedMotion();
+  const isMobile = useIsMobile();
   const pointerX = useMotionValue(0);
   const pointerY = useMotionValue(0);
   const rotateY = useSpring(pointerX, { stiffness: 90, damping: 20 });
@@ -48,7 +50,7 @@ export function Hero() {
       <div aria-hidden className="depth-grid pointer-events-none absolute inset-0" />
       <motion.div
         aria-hidden
-        animate={reduced ? {} : { rotate: 360 }}
+        animate={reduced || isMobile ? {} : { rotate: 360 }}
         transition={{ duration: 28, repeat: Infinity, ease: "linear" }}
         className="absolute left-[8%] top-[20%] size-52 rounded-full border border-primary/20 sm:size-80"
       >
@@ -67,7 +69,7 @@ export function Hero() {
         </motion.div>
 
         <motion.h1
-          style={reduced ? {} : { rotateX, rotateY, z: titleZ, y: titleY, opacity: titleOpacity }}
+          style={reduced || isMobile ? {} : { rotateX, rotateY, z: titleZ, y: titleY, opacity: titleOpacity }}
           className="relative text-[18vw] leading-[0.85] [transform-style:preserve-3d] sm:text-[9rem] lg:text-[11rem]"
         >
           <span aria-hidden className="hero-title-shadow absolute inset-0 text-primary">VISUAL<br />ARCHITECT.</span>
