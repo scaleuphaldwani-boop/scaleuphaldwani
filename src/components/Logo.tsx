@@ -1,8 +1,10 @@
 import { motion } from "framer-motion";
+import { useId } from "react";
 
 type Props = { className?: string };
 
 export function LogoMark({ className = "size-9" }: Props) {
+  const gradId = `logoGrad-${useId().replace(/:/g, "")}`;
   return (
     <motion.svg
       viewBox="0 0 120 90"
@@ -15,7 +17,7 @@ export function LogoMark({ className = "size-9" }: Props) {
       transition={{ type: "spring", stiffness: 300, damping: 18 }}
     >
       <defs>
-        <linearGradient id="logoGrad" x1="0" y1="1" x2="1" y2="0">
+        <linearGradient id={gradId} x1="0" y1="1" x2="1" y2="0">
           <stop offset="0%" stopColor="var(--primary)" />
           <stop offset="100%" stopColor="var(--accent)" />
         </linearGradient>
@@ -24,7 +26,7 @@ export function LogoMark({ className = "size-9" }: Props) {
         cx="52"
         cy="16"
         r="6"
-        fill="url(#logoGrad)"
+        fill={`url(#${gradId})`}
         variants={{
           hidden: { opacity: 0, scale: 0 },
           show: { opacity: 1, scale: 1, transition: { delay: 1.1, type: "spring", stiffness: 320, damping: 14 } },
@@ -33,7 +35,7 @@ export function LogoMark({ className = "size-9" }: Props) {
       />
       <motion.path
         d="M4 78 C 30 74, 44 60, 56 40 L 74 74"
-        stroke="url(#logoGrad)"
+        stroke={`url(#${gradId})`}
         strokeWidth="5"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -44,7 +46,7 @@ export function LogoMark({ className = "size-9" }: Props) {
       />
       <motion.path
         d="M40 78 L 78 24 L 116 78 Z"
-        stroke="url(#logoGrad)"
+        stroke={`url(#${gradId})`}
         strokeWidth="5"
         strokeLinecap="round"
         strokeLinejoin="round"

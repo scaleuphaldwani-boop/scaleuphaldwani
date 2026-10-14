@@ -102,22 +102,38 @@ function Login() {
         </div>
 
         <form onSubmit={submit} className="space-y-4">
-          <input
-            required
-            type="email"
-            className={field}
-            placeholder="Email address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <input
-            required
-            type="password"
-            className={field}
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+          <div>
+            <label htmlFor="login-email" className="sr-only">
+              Email address
+            </label>
+            <input
+              id="login-email"
+              name="email"
+              required
+              type="email"
+              autoComplete="email"
+              className={field}
+              placeholder="Email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <div>
+            <label htmlFor="login-password" className="sr-only">
+              Password
+            </label>
+            <input
+              id="login-password"
+              name="password"
+              required
+              type="password"
+              autoComplete="current-password"
+              className={field}
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
           <button
             type="submit"
             disabled={busy}

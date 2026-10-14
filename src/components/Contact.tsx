@@ -147,41 +147,75 @@ export function Contact() {
             </motion.h3>
 
             <motion.div variants={fadeUp} className="mt-6 space-y-4">
-              <input
-                required
-                className={field}
-                placeholder="Your name"
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-              />
-              <input
-                required
-                type="email"
-                className={field}
-                placeholder="Email address"
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-              />
-              <select
-                className={field}
-                value={form.project}
-                onChange={(e) => setForm({ ...form, project: e.target.value })}
-              >
-                <option value="">Project type</option>
-                <option>Reel / Short-form</option>
-                <option>Brand film</option>
-                <option>Ad / Product spot</option>
-                <option>Cinematography shoot</option>
-                <option>Something else</option>
-              </select>
-              <textarea
-                required
-                rows={4}
-                className={field}
-                placeholder="Footage, deadline, references..."
-                value={form.message}
-                onChange={(e) => setForm({ ...form, message: e.target.value })}
-              />
+              <div>
+                <label htmlFor="enquiry-name" className="sr-only">
+                  Your name
+                </label>
+                <input
+                  id="enquiry-name"
+                  name="name"
+                  required
+                  autoComplete="name"
+                  className={field}
+                  placeholder="Your name"
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  aria-describedby={error ? "enquiry-error" : "enquiry-hint"}
+                />
+              </div>
+              <div>
+                <label htmlFor="enquiry-email" className="sr-only">
+                  Email address
+                </label>
+                <input
+                  id="enquiry-email"
+                  name="email"
+                  required
+                  type="email"
+                  autoComplete="email"
+                  className={field}
+                  placeholder="Email address"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  aria-describedby={error ? "enquiry-error" : "enquiry-hint"}
+                />
+              </div>
+              <div>
+                <label htmlFor="enquiry-project" className="sr-only">
+                  Project type
+                </label>
+                <select
+                  id="enquiry-project"
+                  name="project type"
+                  className={field}
+                  value={form.project}
+                  onChange={(e) => setForm({ ...form, project: e.target.value })}
+                  aria-describedby="enquiry-hint"
+                >
+                  <option value="">Project type</option>
+                  <option>Reel / Short-form</option>
+                  <option>Brand film</option>
+                  <option>Ad / Product spot</option>
+                  <option>Cinematography shoot</option>
+                  <option>Something else</option>
+                </select>
+              </div>
+              <div>
+                <label htmlFor="enquiry-message" className="sr-only">
+                  Footage, deadline, references
+                </label>
+                <textarea
+                  id="enquiry-message"
+                  name="message"
+                  required
+                  rows={4}
+                  className={field}
+                  placeholder="Footage, deadline, references..."
+                  value={form.message}
+                  onChange={(e) => setForm({ ...form, message: e.target.value })}
+                  aria-describedby={error ? "enquiry-error" : "enquiry-hint"}
+                />
+              </div>
             </motion.div>
 
             <motion.button
@@ -209,14 +243,16 @@ export function Contact() {
             </motion.a>
 
             {error && (
-              <p className="mt-3 text-center text-xs text-destructive">{error}</p>
+              <p id="enquiry-error" role="alert" className="mt-3 text-center text-xs text-destructive">
+                {error}
+              </p>
             )}
             {sent && !error && (
-              <p className="mt-3 text-center text-xs text-primary">
+              <p id="enquiry-sent" role="status" className="mt-3 text-center text-xs text-primary">
                 Enquiry sent — it&apos;s in my inbox and I&apos;ll reply the same day.
               </p>
             )}
-            <motion.p variants={fadeUp} className="mt-3 text-center text-xs text-muted-foreground">
+            <motion.p variants={fadeUp} id="enquiry-hint" className="mt-3 text-center text-xs text-muted-foreground">
               Delivered straight to {EMAIL}
             </motion.p>
           </motion.form>
