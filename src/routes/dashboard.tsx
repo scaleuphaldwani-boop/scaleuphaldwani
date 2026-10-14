@@ -118,19 +118,26 @@ function Dashboard() {
                             {r.project_type ?? "Not specified"} · {new Date(r.created_at).toLocaleString()}
                           </p>
                         </div>
-                        <select value={r.status} onChange={(e) => void update(r.id, { status: e.target.value })} className={field}>
+                        <select
+                          aria-label={`Status for enquiry from ${r.name}`}
+                          value={r.status}
+                          onChange={(e) => void update(r.id, { status: e.target.value })}
+                          className={field}
+                        >
                           {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
                         </select>
                       </div>
                       <p className="mt-4 whitespace-pre-wrap text-sm text-muted-foreground">{r.message}</p>
                       <div className="mt-4 flex flex-wrap gap-3">
                         <input
+                          aria-label={`Quote amount in rupees for enquiry from ${r.name}`}
                           type="number" min={0} placeholder="Quote ₹"
                           defaultValue={r.quote_amount ?? ""}
                           onBlur={(e) => void update(r.id, { quote_amount: e.target.value ? Number(e.target.value) : null })}
                           className={`${field} w-36`}
                         />
                         <input
+                          aria-label={`Private notes for enquiry from ${r.name}`}
                           placeholder="Private notes" defaultValue={r.notes ?? ""}
                           onBlur={(e) => void update(r.id, { notes: e.target.value || null })}
                           className={`${field} min-w-0 flex-1`}
