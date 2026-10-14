@@ -86,6 +86,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "Scaleup Haldwani — video editor and cinematographer crafting reels, brand films and ads with CapCut Pro, Premiere Pro and After Effects.",
       },
       { name: "author", content: "Scaleup Haldwani" },
+      {
+        name: "google-site-verification",
+        content: "4tLYDMnPHioyQw5Sv9fTlfA-Lwkyq_6JF6blgy7CNKE",
+      },
       { property: "og:title", content: "Scaleup Haldwani | Video Editor & Cinematographer" },
       {
         property: "og:description",
