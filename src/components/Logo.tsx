@@ -1,8 +1,10 @@
 import { motion } from "framer-motion";
+import { useId } from "react";
 
 type Props = { className?: string };
 
 export function LogoMark({ className = "size-9" }: Props) {
+  const gradId = `logoGrad-${useId().replace(/:/g, "")}`;
   return (
     <motion.svg
       viewBox="0 0 120 90"
